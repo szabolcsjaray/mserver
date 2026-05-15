@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR kód</title>
+    <script src="js/qrcode.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #qrcode { margin: 20px auto; display: inline-block; }
+        #status { margin-top: 20px; font-size: 18px; }
+        #openPage { font-weight: bold; font-size: 25px; }
+    </style>
+</head>
+<body>
+    <h1>QR kód</h1>
+    <p>Nyitó weboldal címe: <p id="openPage"></p></p>
+    <div id="status">IP cím lekérdezése...</div>
+    <div id="qrcode"></div>
+
+    <script>
+	    function readResource(resource, process) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					// Typical action to be performed when the document is ready:
+					console.log("returned value: " + xhttp.responseText);
+                    document.getElementById("status").innerHTML = "";
+                    let pageAddr = "http://" + xhttp.responseText.trim() + ":8000";
+                    document.getElementById("openPage").innerHTML = pageAddr;
+					process(pageAddr);
+				}
+			};
+			xhttp.open("GET", resource, true);
+			xhttp.send();
+		}
+
+        function generateQR(url) {
+            document.getElementById('qrcode').innerHTML = ''; // Clear previous
+            new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H // High error correction
+            });
+        }
+
+        const currentUrl = window.location.href;
+        const statusEl = document.getElementById('status');
+		var ipAddr = readResource("./cgi-bin/ipaddress.py", processAddress);
+		
+		function processAddress(address) {
+			generateQR(address);
+		}
+    </script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lorum pontok</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Header with Big Box and Small Boxes</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 80px 1fr; /* Header takes 80px, rest for content */
+      background-color: #201e1e;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      /*display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;*/
+      font-weight: bold;
+      height: 40px;
+      text-align: center;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 20px;
+      padding: 10px;
+      height: 100%;
+    }
+
+    /*.content > * {
+        min-width: 0;
+    }*/
+
+    /* The big central box spans 2x2 grid cells */
+    .big-box {
+      grid-column: 2 / 4;   /* columns 2 to 3 (spanning 2 columns) */
+      grid-row: 2 / 3;      /* rows 2 to 3 (spanning 2 rows) */
+      background-color: #4a90e2;
+      border-radius: 12px;
+      color: rgb(255, 255, 255);
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 40px;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* Smaller boxes */
+    .small-box {
+      background-color: #7ed321;
+      border-radius: 10px;
+      text-align: center;
+      color: rgb(33, 33, 124);
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    /* Optional: add some hover effect 
+    .small-box:hover, .big-box:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+    }*/
+
+    .name {
+        display: inline-block;
+        font-size: 30px;
+        padding: 3px;
+
+    }
+    .point {
+        display: inline-block;
+        font-size: 40px;
+        padding: 3px;
+        margin-left: 10px;
+    }
+
+    .dropNum {
+        font-size: 30px;
+        width: 30%;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .minus1 {
+        display: none;
+        margin: 3px;
+        border-radius: 10px;
+        background-color: rgb(238, 255, 116);;
+        font-size: 30px;
+        padding: 4px;
+    }
+
+    .minusM {
+        display: inline-block;
+        margin: 3px;
+        border-radius: 10px;
+        background-color: rgb(238, 255, 116);;
+        font-size: 30px;
+        padding: 4px;
+    }
+
+    #pont {
+        display: inline-block;
+
+    }
+
+    button.menet {
+        font-size: 30px;
+        font-weight: bold;;
+        background-color: #4a90e2;
+        border-radius: 10px;
+        padding: 5px;
+        color: rgb(255, 255, 255);
+    }
+
+    #message {
+      font-size: 20px;
+    }
+
+    button.control {
+      background-color: #7ed321;
+      color: #2424ae;
+    }
+
+       /* Overlay that darkens the background */
+    .modal-overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    /* The actual popup box */
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Close button */
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .close-btn:hover {
+      color: #000;
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Button to open the modal */
+    .open-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .open-btn:hover {
+      background-color: #0056b3;
+    }
+
+    button.remove {
+      position:absolute;
+      top: 3px;
+      right: 3px;
+      background-color: red;
+      color: white;
+      font-size: 20px;
+    }
+
+  </style>
+  <script>
+
+    const GAME = 0;
+    const COUNTING = 1;
+    const WINNER = 2;
+    const NONE = "none";
+    const VISIBLE = "inline-block";
+
+    var mode = GAME;
+    var points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+    var playerNum = 0;
+
+    var basket = 0;
+    var modal;
+      
+        function el(id) {
+            return document.getElementById(id);
+        }
+
+        function message(m) {
+          el("message").innerHTML = m;
+        }
+
+        function pointsReset() {
+            basket = 0;
+            addBasket(0);
+            for(let i = 0; i<=9; i++) {
+              points[i] = 40;
+              addPoint(i, 0);
+            }
+        }
+
+        function colorPlayerBlocks() {
+          for(let i = 0; i <10; i++) {
+            if (i < playerNum) {
+              el("box" + i).style.backgroundColor = "";
+            } else {
+              el("box" + i).style.backgroundColor = "grey";
+            }
+          }
+        }
+        
+        function init() {
+            el("game1").onclick = gameMode;
+            el("counting").onclick = countingMode;
+            el("player").onclick = addPlayer;
+            el("newName").onchange = doAddPlayer;
+            el("newGame").onclick = startNewGame;
+            mode = COUNTING;
+            fillBoxes();
+            gameMode();
+            pointsReset();
+            colorPlayerBlocks();
+            modal = document.getElementById('modal');
+        }
+
+        function startNewGame() {
+          if (confirm("Új játékot indítész (pontok visszaállítása)?")) {
+            doNewGame();
+          }
+        }
+
+        function doNewGame() {
+          pointsReset();
+          mode = COUNTING;
+          gameMode();
+        }
+
+        function addPlayer() {
+          if (playerNum <10) {
+            openModal();
+            el("newName").focus();
+          }
+        }
+
+        function doAddPlayer() {
+            el("name" + playerNum).innerHTML = el("newName").value;
+            el("newName").value = "";
+            playerNum++;
+            colorPlayerBlocks();
+            closeModal();
+        }
+
+        function addPoint(i, point) {
+          points[i] += point;
+          el("pont"+i).innerHTML = points[i];
+        }
+
+        function multiDrop(index, value) {
+          el("dropNum" + index).value = value;
+        }
+
+        function addBasket(num) {
+          basket = basket + parseInt(num);
+          el("pont").innerHTML = basket;
+        }
+
+        function setName(i, name) {
+          el("name"+i).innerHTML = name;
+        }
+
+        function fillBoxes() {
+          for(let i = 0; i<=9; i++) {
+              let html = "        <div class=\"name\" id=\"name"+i+"\">Kornél</div>"
+                + "<div class=\"point\" id=\"pont"+i+"\">40</div><br>"
+                + "<button class=\"minus1\" style=\"display: none;\" id=\"minus1_"+i+"\" > -1 </button>" 
+                + "<button class=\"minusM\" style=\"display: inline-block;\" id=\"down"+i+"\"> &darr; </button>"
+                + "<input class=\"dropNum\" type=\"number\"  style=\"display: inline-block;\" id=\"dropNum"+i+"\">"
+                + "<button class=\"minusM\" style=\"display: inline-block;\" id=\"up"+i+"\"> &uarr; </button>"
+                + "<button class=\"minusM\" style=\"display: inline-block;\" id=\"minusM"+i+"\"> DOB </button>"
+                + "<button class=\"menet remove\" id=\"playerRemove"+i+"\"> X </button>";
+              el("box"+i).innerHTML = html;
+              el("minus1_"+i).onclick = doMinus1;
+              el("minusM"+i).onclick = doMinusM;
+              el("up"+i).onclick = doUp;
+              el("down"+i).onclick = doDown;
+              el("name"+i).onclick = winnerSet;
+              el("playerRemove"+i).onclick = playerRemove;
+
+              multiDrop(i, 0);
+              setName(i, "---");
+          }
+        }
+
+        function playerRemove(evt) {
+          let id = parseInt(evt.target.id["playerRemove".length]);
+          if (id >= playerNum) return;
+          if (confirm("A játékos " + el("name"+id).innerText + " biztosan kiszáll?")) {
+            points.splice(id, 1);
+            points.push(0);
+            for(let i = id; i < playerNum+1; i++) {
+              let nextI = i+1;
+              if (nextI >= 9) {
+                el("name9").innerHTML = "---";
+              } else {
+                el("name" + i).innerHTML = el("name" + nextI).innerHTML;
+              }
+              addPoint(i, 0);
+            }
+            playerNum--;
+            colorPlayerBlocks();
+          }
+        }
+
+        function playSound(sound) {
+          let audio = new Audio(sound+'.mp3');
+          audio.play();
+        }
+
+        function doMinus1(evt){
+          let id = evt.target.id[7];
+          if (id >= playerNum) return;
+          if (points[id] == 0) return;
+          playSound("drop");
+          addPoint(id, -1);
+          addBasket(1);
+        }
+
+        function doMinusM(evt){
+          let id = evt.target.id[6];
+          if (id >= playerNum) return;
+          playSound("drops");
+          addPoint(id, -1 * el("dropNum"+id).value);
+          addBasket(el("dropNum"+id).value);
+          el("dropNum"+id).value = 0;
+        }        
+
+        function doUp(evt){
+          let id = evt.target.id[2];  
+          if (id >= playerNum) return;
+          let val = el("dropNum" + id).value;
+          val++;
+          el("dropNum"+id).value = val;
+        }
+
+        function doDown(evt){
+          if (id >= playerNum) return;
+          let id = evt.target.id[4];
+          let val = el("dropNum" + id).value;
+          val--;
+          if (val < 0) {
+            val = 0;
+          }
+          el("dropNum"+id).value = val;
+          
+        }        
+
+        function winnerSet(evt) {
+          if (mode != WINNER) return;
+          let id = evt.target.id[4];
+          if (id > playerNum) return;
+          let multi = 1;
+          playSound('ding');
+          addPoint(id, basket * multi);
+          basket = 0;
+          addBasket(0);
+          gameMode();
+        }
+
+        function gameMode() {
+            if (mode == COUNTING || mode == WINNER) {
+              if (basket > 0) {
+                message("Ki nyerte a kört? Névre katt/nyom.");
+                el("game1").style.backgroundColor = "yellow";
+                mode = WINNER;
+                return;
+              }
+              message("Dobjatok be egyet, ha kell!");
+              el("game1").style.backgroundColor = "rgb(35, 37, 181)";
+              el("counting").style.backgroundColor = "gray";
+              setClassVisibility("minus1", VISIBLE);
+              setClassVisibility("dropNum", NONE);
+              setClassVisibility("minusM", NONE);
+              mode = GAME;
+            }
+        }
+
+        function countingMode() {
+          if (mode == GAME) {
+            message("MIndenki dobjon be annyit, amennyi kártyája maradt!");
+            el("counting").style.backgroundColor = "rgb(35, 37, 181)";
+            el("game1").style.backgroundColor = "gray";
+            setClassVisibility("minus1", NONE);
+            setClassVisibility("dropNum", VISIBLE);
+            setClassVisibility("minusM", VISIBLE);
+            mode = COUNTING;
+          }
+        }
+
+        function setClassVisibility(className, visbility) {
+            const elements = document.getElementsByClassName(className);
+            for (let el of elements) {
+                el.style.display = visbility;
+            }
+        }
+
+        function openModal() {
+          modal.style.display = 'flex'; // Show overlay and center content
+        }
+
+        function closeModal() {
+          modal.style.display = 'none';
+        }
+
+        // Optional: Close when clicking outside the popup content
+        window.onload = init;
+  </script>
+</head>
+<body>
+  <div class="content">
+    <!-- Small boxes around the edges -->
+    <div class="small-box" id="box0"></div>
+    <div class="small-box" id="box1"></div>
+    <div class="small-box"  id="box2"></div>
+    <div class="small-box"  id="box3"></div>
+
+    <!-- Empty cells for spacing -->
+    <div class="big-box">
+       Kosár: <div id="pont">13</div><br>
+       <button class="menet control" id="newGame"> ÚJ </button>
+       <button class="menet control" id="player">  + </button> &nbsp;
+      <button class="menet" id="game1"> JÁTÉK </button>
+      <button class="menet" id="counting"> ELSZÁMOLÁS </button><br>
+      <div id="message"></div>
+    </div>
+
+    <div class="small-box"  id="box4"></div>
+    <div class="small-box"  id="box5"></div>
+    <div class="small-box"  id="box6"></div>
+    <div class="small-box"  id="box7"></div>
+    <div class="small-box"  id="box8"></div>
+    <div class="small-box"  id="box9"></div>
+
+</div>
+    <div class="modal-overlay" id="modal">
+      <div class="modal-content">
+        <h2>Új játékos</h2><br>
+        <p style="font-size: 30px;">Név: <input class="menet" id="newName" style="font-size: 30px;"></p>
+        <button class="open-btn" onclick="closeModal()" style="margin-top: 20px;">Bezár</button>
+      </div>
+  </div>
+
+</body>
+</html>
