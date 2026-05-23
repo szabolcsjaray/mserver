@@ -110,7 +110,8 @@ function refreshPoints() {
 
 function addPoint(i, point) {
   points[i] += point;
-  el("pont"+i).innerHTML = points[i];
+  el("pont"+i).innerHTML = "" + points[i] 
+    + (lastPoints[i] != NO_LAST_POINT ? " (" + lastPoints[i] + ")" : "");
 }  
 
 function multiDrop(index, value) {
@@ -140,6 +141,7 @@ function doMinusM(evt){
     return;
   }
   playSound("drops");
+  lastPoints[id] = el(Html.DROP_NUM_INPUT + "_"+id).value;
   addPoint(id, factor * el(Html.DROP_NUM_INPUT + "_"+id).value);
   if (isVisible(Html.BASKET)) {
     addBasket(el(Html.DROP_NUM_INPUT + "_"+id).value);
@@ -239,7 +241,7 @@ function hideElements(id) {
 }
 
 function showElements(id, showStyle) {
-  for(let i = 0; i < MAX_PLAYER_NUM; i++) {
+  for(let i = 0; i < playerNum; i++) {
     el(id+"_"+i).style.display = showStyle;
   }
 }

@@ -41,6 +41,12 @@ Engine.fn = Object.assign( Engine.fn || {}, {
             }
             refreshPoints();
         }
+        if (actPhase == States.TURN) {
+            for(i = 0; i < playerNum; i++) {
+                lastPoints[i] = NO_LAST_POINT;
+                addPoint(i, 0);
+            }
+        }
     },
     getValue(rule) {
         let actGame = Games.fn.cgames[Games.fn.running];

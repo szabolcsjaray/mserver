@@ -18,6 +18,7 @@ Players.addPlayer = function (playerName) {
         player = new Players.Player(playerName);
         Players.players.push(player);
         Players.saveStoredPlayers();
+        Engine.fn.runPhase();
     }
     return player;
 };

@@ -6,9 +6,14 @@ const WINNER = 2;
 const NONE = "none";
 const VISIBLE = "inline-block";
 const MAX_PLAYER_NUM = 10;
+const NO_LAST_POINT = 100000;
 
 var mode = GAME;
 var points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+var lastPoints = [
+    NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT,
+    NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT
+];
 var playerNum = 0;
 
 var basket = 0;
