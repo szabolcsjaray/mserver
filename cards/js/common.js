@@ -1,29 +1,32 @@
 // common stuff
+export const MAX_PLAYER_NUM = 10;
+export const NO_LAST_POINT = 100000;
 
-const GAME = 0;
-const COUNTING = 1;
-const WINNER = 2;
-const NONE = "none";
-const VISIBLE = "inline-block";
-const MAX_PLAYER_NUM = 10;
-const NO_LAST_POINT = 100000;
-
-var mode = GAME;
-var points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
-var lastPoints = [
+export const points = [40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+export const lastPoints = [
     NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT,
     NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT, NO_LAST_POINT
 ];
-var playerNum = 0;
+export const Common = {
+    playerNum : 0,
+    nasket : 0,
+    addPlayerModal : null
+};
 
-var basket = 0;
-var addPlayerModal;
+export let playerNum = 0;
 
-function el(id) {
-    return document.getElementById(id);
+export var basket = 0;
+export let addPlayerModal;
+
+export function el(id) {
+    let element = document.getElementById(id);
+    if (element == null) {
+        throw new Error("Element with id: " + id + "could not be found!");
+    }
+    return element;
 }
 
-function isVisible(id) {
+export function isVisible(id) {
     let element = el(id);
     return !(element.style.display == undefined 
         || element.style.display == null

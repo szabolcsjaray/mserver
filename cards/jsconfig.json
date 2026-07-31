@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",   // or "node" if using Node.js
+    "target": "ES2022",
+    "checkJs": false,                 // enables type checking & better autocomplete in .js files
+    "allowJs": true,
+    "paths": {
+      "*": ["./*"]
+    }
+  },
+  "include": ["**/*.js"],
+  "exclude": ["node_modules"]
+}

@@ -1,4 +1,4 @@
-const RuleAction = window.RuleAction = window.RuleAction || {
+export const RuleAction = {
     SHOW: 0,
     HIDE: 1,
     SHOW_INLINE_BLOCK : 2,
@@ -6,6 +6,8 @@ const RuleAction = window.RuleAction = window.RuleAction || {
     HIDE_ALL: 4,
     SHOW_ALL : 5,
     MESSAGE : 6,
+    HIDE_CLASS : 7,
+    RUN : 8,
 
     ALLOW_MINUS_AT_DROP_NUM : 100,
     DROP_DECREASE_POINT: 101,
@@ -13,7 +15,7 @@ const RuleAction = window.RuleAction = window.RuleAction || {
     ZERO_POINT: 2000
 };
 
-const RuleActionDefaultValue  = window.RuleActionDefaultValue = window.RuleActionDefaultValue || [
+export const RuleActionDefaultValue  = [
     [RuleAction.ALLOW_MINUS_AT_DROP_NUM , false],
     [RuleAction.DROP_DECREASE_POINT, false]
 ];

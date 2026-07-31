@@ -1,4 +1,4 @@
-const Html = window.Html = window.Html || {
+export const Html = {
     BASKET : "basket",
     CHANGE_GAME_BUTTON : "changeGameButton", 
     GAME_CHANGE_MODAL : "modalGameChange", //div
@@ -15,6 +15,17 @@ const Html = window.Html = window.Html || {
     MINUS_DROP_NUM_BUTTON : "minusM",
     PLAY_BUTTON : "game1",
     TURN_BUTTON : "counting",
-
+    POINT_CLASS: "point",
+    ROLE_ICON_CLASS: "role",
+    NEXT_BUTTON : "start",
+    SHOW_PLAYER_CLASS : "showPlayer",
+    CHOOSE_ROLES_OVERLAY : "chooseRolesOverlay",
+    CHOOSE_ROLES : "chooseRoles",
+    ACTIVE_ROLES : "activeRoles",
+    PASSIVE_ROLES : "passiveRoles",
+    ROLE_ICON_CHOICE_CLASS : "roleChoice",
+    ROLES_SELECTED_BUTTON : "rolesSelectedButton",
+    ROLE_ICON : "roleIcon",
+    PLAYER_OP_CLASS : "playerOp",
     DUMMY : ""
-}
+};

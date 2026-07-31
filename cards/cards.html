@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cards</title>
-  <script src="js/common.js"></script>
+  <!--script src="js/common.js"></script>
   <script src="js/html.js"></script>
   <script src="js/rules.js"></script>
   <script src="js/states.js" ></script>
+  <script src="js/city/cityplayer.js" ></script>
+  <script src="js/city/city.js" ></script>
   <script src="js/games.js" ></script>
   <script src="js/player.js" ></script>
-  <script src="js/engine.js"></script>
-  <script src="js/cards.js" ></script>
+  <script src="js/engine.js"></script-->
+  <script src="js/cards.js" type="module"></script>
   <link type="text/css" rel="stylesheet" href="css/cards.css">
 </head>
 <body>
@@ -22,21 +24,24 @@
        <div id="basket">Kosár: <div id="pont">13</div></div><br>
        <div id="message"></div><br>
        <button class="menet control" id="newGame"> ÚJ </button>
-       <button class="menet control" id="player">  + </button> &nbsp;
-      <button class="menet" id="game1"> JÁTÉK </button>
-      <button class="menet" id="counting"> ELSZÁMOLÁS </button><br>
+       <button class="menet control" id="player">  + játékos </button>
+        &nbsp;
+       <button class="menet control" id="start">  TOVÁBB </button>
+
+       <button class="menet" id="game1"> JÁTÉK </button>
+       <button class="menet" id="counting"> ELSZÁMOLÁS </button><br>
       
     </div>
-    <div class="small-box" id="box0"></div>
-    <div class="small-box" id="box1"></div>
-    <div class="small-box"  id="box2"></div>
-    <div class="small-box"  id="box3"></div>
-    <div class="small-box"  id="box4"></div>
-    <div class="small-box"  id="box5"></div>
-    <div class="small-box"  id="box6"></div>
-    <div class="small-box"  id="box7"></div>
-    <div class="small-box"  id="box8"></div>
-    <div class="small-box"  id="box9"></div>
+    <div class="small-box empty" id="box0"></div>
+    <div class="small-box empty" id="box1"></div>
+    <div class="small-box empty"  id="box2"></div>
+    <div class="small-box empty"  id="box3"></div>
+    <div class="small-box empty"  id="box4"></div>
+    <div class="small-box empty"  id="box5"></div>
+    <div class="small-box empty"  id="box6"></div>
+    <div class="small-box empty"  id="box7"></div>
+    <div class="small-box empty"  id="box8"></div>
+    <div class="small-box empty"  id="box9"></div>
 
 </div>
   <div class="modal-overlay" id="modal">
@@ -63,6 +68,23 @@
         </div>
         <button class="open-btn" id="selectGameButton" style="margin-top: 20px;">Váltás</button>
         <button class="open-btn" id="quitSelectGameButton" style="margin-top: 20px;">Mégsem</button>
+      </div>
+  </div>
+    <div class="modal-overlay" id="chooseRolesOverlay">
+      <div class="modal-content" id="chooseRoles">
+        <h2>Szerepek kiválogatása</h2><br>
+        Kattints egy szerepre az átmozgatásához!<br><br>
+        <h3>Használt szerepek:</h3>
+        <div class="roleBoxClass" style="background-color: rgb(196, 255, 214);" id="activeRoles">
+
+        </div>
+        <br><br>
+        <h3>Használaton kívüli szerepek:</h3>
+        <div class="roleBoxClass" style="background-color: rgb(255, 210, 196);" id="passiveRoles">
+        </div>
+
+
+        <button class="open-btn" id="rolesSelectedButton" style="margin-top: 20px;">Kész</button>
       </div>
   </div>
 

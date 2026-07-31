@@ -1,5 +1,8 @@
+import {Engine} from './engine.js';
+import { doAddPlayer } from './cards.js';
+
 // Players
-const Players = window.Players = window.Players || Object.create(null);
+export const Players = {};
 
 Players.players = []; // Player objects
 const PLAYERS_STORAGE_KEY = "cards.players";
@@ -18,7 +21,7 @@ Players.addPlayer = function (playerName) {
         player = new Players.Player(playerName);
         Players.players.push(player);
         Players.saveStoredPlayers();
-        Engine.fn.runPhase();
+        Engine.runPhase();
     }
     return player;
 };
@@ -60,4 +63,18 @@ Players.addLastPlayer = function (name) {
         Players.lastPlayers.push(name);
         Players.writeLastPlayersToStore();
     }
+};
+
+Players.findFreePlayer = function (playerI) {
+    let direnction = (Math.random() < 0.5) ? -1 : 1;
+    while (Players.players[playerI].role != undefined) {
+        playerI += direnction;
+        if (playerI < 0) {
+            playerI = Players.players.length - 1;
+        }
+        if (playerI >= Players.players.length) {
+            playerI = 0;
+        }
+    }
+    return [Players.players[playerI], playerI];
 };

@@ -1,10 +1,14 @@
-// Game logic engine
-const Engine = window.Engine = window.Engine || {};
+import {points, lastPoints, Common, el, MAX_PLAYER_NUM, NO_LAST_POINT} from './common.js';
+import { RuleAction, RuleActionDefaultValue } from './rules.js';
+import { States } from './states.js';
+import { Games } from './games.js';
+import { refreshPoints, message, showElements, hideElements, showClass, hideClass, addPoint } from './cards.js';
 
-Engine.fn = Object.assign( Engine.fn || {}, {
+// Game logic engine
+export const Engine = {
     runPhase() {
-        let actGame = Games.fn.cgames[Games.fn.running];
-        let actPhase = Games.fn.phase;
+        let actGame = Games.cgames[Games.running];
+        let actPhase = Games.phase;
         for(let i = 0; i < actGame.rules.length; i++) {
             if (actGame.rules[i][0] == actPhase) {
                 console.log("run rule: " + actGame.rules[i][1] + " on " + actGame.rules[i][2]);
@@ -27,30 +31,39 @@ Engine.fn = Object.assign( Engine.fn || {}, {
                     case RuleAction.SHOW_ALL : 
                         showElements(actGame.rules[i][2], "inline-block");
                         break;
+                    case RuleAction.HIDE_CLASS : 
+                        hideClass(actGame.rules[i][2]);
+                        break;
+                    case RuleAction.SHOW_CLASS : 
+                        showClass(actGame.rules[i][2], "inline-block");
+                        break;
                     case RuleAction.MESSAGE : 
                         message(actGame.rules[i][2]);
                         break;
+                    case RuleAction.RUN :
+                        actGame.rules[i][2]();
+                        break;
                     default:
-                        console.log("Unkonw rule action: " + actGame.rules[i][1] + " ("+i+". rule)");
+                        console.log("Unknown rule action: " + actGame.rules[i][1] + " ("+i+". rule)");
                 }
             }
         }
         if (actPhase == States.INITIAL) {
-            for(i = 0; i < MAX_PLAYER_NUM; i++) {
+            for(let i = 0; i < MAX_PLAYER_NUM; i++) {
                 points[i] = actGame.startPoint;
             }
             refreshPoints();
         }
         if (actPhase == States.TURN) {
-            for(i = 0; i < playerNum; i++) {
+            for(let i = 0; i < Common.playerNum; i++) {
                 lastPoints[i] = NO_LAST_POINT;
                 addPoint(i, 0);
             }
         }
     },
     getValue(rule) {
-        let actGame = Games.fn.cgames[Games.fn.running];
-        let actPhase = Games.fn.phase;
+        let actGame = Games.cgames[Games.running];
+        let actPhase = Games.phase;
         for(let i = 0; i < actGame.rules.length; i++) {
             if (actGame.rules[i][0] == actPhase || actGame.rules[i][0] == States.ALL) {
                 if (actGame.rules[i][1] == rule) {
@@ -65,4 +78,4 @@ Engine.fn = Object.assign( Engine.fn || {}, {
         }
         return null;
     }
-});
+};

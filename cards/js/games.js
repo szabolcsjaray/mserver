@@ -1,7 +1,12 @@
-// games
-const Games = window.Games = window.Games || {};
+import { el }from './common.js';
+import { States } from './states.js';
+import { RuleAction } from './rules.js';
+import { Html } from './html.js';
+import {City } from './city/city.js';
+import { Engine } from './engine.js';
+import { makeOption } from './cards.js';
 
-Games.fn = Object.assign( Games.fn || {}, {
+export const Games = {
     Game : class {
         constructor(name, states, rules, startPoint, endPoint) {
             this.name = name;
@@ -23,36 +28,36 @@ Games.fn = Object.assign( Games.fn || {}, {
         el(Html.QUIT_SELECT_GAME_BUTTON).onclick = function(){
             el(Html.GAME_CHANGE_MODAL).style.display = "none";
         };
-        el(Html.SELECT_GAME_BUTTON).onclick = Games.fn.changeTheGame;
+        el(Html.SELECT_GAME_BUTTON).onclick = Games.changeTheGame;
         let select = el(Html.SELECT_GAME);
         select.options.length = 0;
-        for(let i = 0; i < Games.fn.cgames.length; i++) {
-            select.appendChild(makeOption(i, Games.fn.cgames[i].name));
+        for(let i = 0; i < Games.cgames.length; i++) {
+            select.appendChild(makeOption(i, Games.cgames[i].name));
         }
     },
     changeTo(newGame) {
-        el(Html.GAME_NAME_DIV).innerHTML = Games.fn.cgames[newGame].name;
-        Games.fn.phase = States.CLOSING;
-        Engine.fn.runPhase();
+        el(Html.GAME_NAME_DIV).innerHTML = Games.cgames[newGame].name;
+        Games.phase = States.CLOSING;
+        Engine.runPhase();
 
-        Games.fn.running = newGame;
-        Games.fn.phase = States.INITIAL;
-        Engine.fn.runPhase();
+        Games.running = newGame;
+        Games.phase = States.INITIAL;
+        Engine.runPhase();
 
-        Games.fn.setPhase(States.PLAY);
+        Games.setPhase(States.PLAY);
     },
     changeTheGame() {
-        if (el(Html.SELECT_GAME).value != Games.fn.running) {
-            Games.fn.changeTo(el(Html.SELECT_GAME).value);
+        if (el(Html.SELECT_GAME).value != Games.running) {
+            Games.changeTo(el(Html.SELECT_GAME).value);
         }
         el(Html.GAME_CHANGE_MODAL).style.display = "none";
     },
     initButtons() {
-        el(Html.CHANGE_GAME_BUTTON).onclick = Games.fn.showChangeTheGame;
+        el(Html.CHANGE_GAME_BUTTON).onclick = Games.showChangeTheGame;
     },
     setPhase(newPhase) {
-        Games.fn.phase = newPhase;
-        Engine.fn.runPhase();
+        Games.phase = newPhase;
+        Engine.runPhase();
         if (newPhase == States.TURN) {
             el("counting").style.backgroundColor = "rgb(35, 37, 181)";
             el("game1").style.backgroundColor = "gray";
@@ -64,27 +69,24 @@ Games.fn = Object.assign( Games.fn || {}, {
         }
     },
     stepPhase() {
-        let game = Games.fn.cgames[Games.fn.running];
-        let i = game.states.indexOf(Games.fn.phase);
+        let game = Games.cgames[Games.running];
+        let i = game.states.indexOf(Games.phase);
         i++;
         if (i >= game.states.length || i == -1) {
             i = 0;
         }
-        Games.fn.setPhase(game.states[i]);
+        Games.setPhase(game.states[i]);
     }
-});
+};
 
-Games.fn.cgames = [
-    new Games.fn.Game(
+Games.cgames = [
+    new Games.Game(
         "Jágó",
         [States.PLAY, States.TURN],
         [
-            [States.INITIAL, RuleAction.HIDE_ALL, Html.MINUS_1_BUTTON],
-            [States.INITIAL, RuleAction.HIDE_ALL, Html.DOWN_BUTTON],
-            [States.INITIAL, RuleAction.HIDE_ALL, Html.UP_BUTTON],
-            [States.INITIAL, RuleAction.HIDE_ALL, Html.DROP_NUM_INPUT],
-            [States.INITIAL, RuleAction.HIDE_ALL, Html.MINUS_DROP_NUM_BUTTON],
+            [States.INITIAL, RuleAction.HIDE_CLASS, Html.PLAYER_OP_CLASS],
             [States.INITIAL, RuleAction.HIDE, Html.BASKET],
+            [States.INITIAL, RuleAction.HIDE, Html.NEXT_BUTTON],
 
             [States.TURN, RuleAction.MESSAGE, "Rendezzétek a pontokat és katt/nyom az JÁTÉK-ra!"],
             [States.TURN, RuleAction.SHOW_ALL, Html.DOWN_BUTTON],
@@ -104,11 +106,13 @@ Games.fn.cgames = [
         0,
         100
     ),
-    new Games.fn.Game(
+    new Games.Game(
         "Lórum",
         [States.PLAY, States.TURN, States.SELECT_WINNER],
         [
+            [States.INITIAL, RuleAction.HIDE_CLASS, Html.PLAYER_OP_CLASS],
             [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.BASKET],
+            [States.INITIAL, RuleAction.HIDE, Html.NEXT_BUTTON],
             [States.CLOSING, RuleAction.HIDE, Html.BASKET],
 
             [States.PLAY, RuleAction.MESSAGE, "Dobjatok be egyet, ha kell!"],
@@ -133,5 +137,34 @@ Games.fn.cgames = [
         ],
         40,
         100
+    ),
+    new Games.Game(
+        "Alszik a város",
+        [States.CHOOSE_ROLES, States.SHOW_PLAYERS, States.FIRST_NIGHT, States.DAY, States.NIGHT, States.MORNING],
+        [
+            [States.INITIAL, RuleAction.HIDE, Html.BASKET],
+            [States.INITIAL, RuleAction.HIDE, Html.PLAY_BUTTON],
+            [States.INITIAL, RuleAction.HIDE, Html.TURN_BUTTON],
+            [States.INITIAL, RuleAction.HIDE_CLASS, Html.PLAYER_OP_CLASS],
+            [States.INITIAL, RuleAction.HIDE_CLASS, Html.POINT_CLASS],
+            [States.INITIAL, RuleAction.SHOW_CLASS, Html.ROLE_ICON_CLASS],
+            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.NEXT_BUTTON],
+            [States.INITIAL, RuleAction.MESSAGE, "Válogasd össze a játékosokat, majd Tovább gomb!"],
+
+            [States.CHOOSE_ROLES, RuleAction.MESSAGE, "Válogasd össze a szerepeket, majd Tovább gomb!"],
+            [States.CHOOSE_ROLES, RuleAction.RUN, City.fillChooseRoles],
+            [States.CHOOSE_ROLES, RuleAction.SHOW, Html.CHOOSE_ROLES_OVERLAY],
+
+            [States.SHOW_PLAYERS, RuleAction.RUN, City.saveActiveRoles],
+            [States.SHOW_PLAYERS, RuleAction.HIDE, Html.CHOOSE_ROLES_OVERLAY],
+            [States.SHOW_PLAYERS, RuleAction.RUN, City.setRandomRoles],
+
+            [States.SHOW_PLAYERS, RuleAction.SHOW_ALL, Html.SHOW_PLAYER_CLASS],
+            [States.SHOW_PLAYERS, RuleAction.MESSAGE, "Mutasd meg egyesével a játékosoknak a szerepüket!"],
+
+            [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS]
+        ],
+        0,
+        0
     )
 ];
