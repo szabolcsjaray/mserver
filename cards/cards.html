@@ -78,6 +78,9 @@
         <div class="roleBoxClass" style="background-color: rgb(196, 255, 214);" id="activeRoles">
 
         </div>
+        <p>
+        Polgárok száma: <span id="citizenCount">0</span>
+        </p>
         <br><br>
         <h3>Használaton kívüli szerepek:</h3>
         <div class="roleBoxClass" style="background-color: rgb(255, 210, 196);" id="passiveRoles">
@@ -98,6 +101,27 @@
         <button class="open-btn" id="showRoleCloseButton" style="margin-top: 20px;">Bezár</button>
       </div>
   </div>
+    <div class="modal-overlay" id="firstNightOverlay">
+      <div class="modal-content" id="firstNightContent">
+        <h2>Első éjszaka</h2><br>
+        <div id="firstNightChameleon">
+          Kit választott a kaméleon? <select class="menet" id="chameleonSelect" style="font-size: 20px;width:70%;">
+            </select><br>
+          <button class="open-btn" id="firstNightChameleonButton" style="margin-top: 20px;">Kész</button>
+        </div>
+        <div id="firstNightDirector">
+          Kit kérdezett az igaztató?<select class="menet" id="directorSelect" style="font-size: 20px;width:70%;">
+            </select><br>
+          <button class="open-btn" id="firstNightDirectorButton" style="margin-top: 20px;">Kész</button>
+        </div>
+        <div id="firstNightKillersMeeting">
+          A gyilkosok ismerjék meg egymást!<br>
+          <button class="open-btn" id="firstNightKillersMeetingButton" style="margin-top: 20px;">Kész</button>
+        </div>
+        <button class="open-btn" id="firstNightNextButton" style="margin-top: 20px;">Hajnal</button>
+      </div>
+    </div>
+
 
 </body>
 </html>
