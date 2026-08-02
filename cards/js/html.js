@@ -27,5 +27,13 @@ export const Html = {
     ROLES_SELECTED_BUTTON : "rolesSelectedButton",
     ROLE_ICON : "roleIcon",
     PLAYER_OP_CLASS : "playerOp",
+    SHOW_ROLE_WINDOW : "showRoleOverlay",
+    SHOW_ROLE_CONTENT: "showRoleContent",
+    SHOW_ROLE_IMG : "showRoleImg",
+    SHOW_ROLE_NAME : "showRoleName",
+    SHOW_ROLE_DESC : "showRoleDesc",
+    SHOW_ROLE_PLAYER : "showRolePlayer",
+    SHOW_ROLE_CLOSE_BUTTON : "showRoleCloseButton",
+
     DUMMY : ""
 };

@@ -55,5 +55,8 @@ export const City = {
         if (id >= Common.playerNum) return;
         el(Html.SHOW_PLAYER_CLASS + "_" +id).style.backgroundColor = "#060";
         City.showRole(id);
+    },
+    showRole : function(playerI) {
+        let player = Players.players[playerI];
     }
 }

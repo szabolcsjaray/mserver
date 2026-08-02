@@ -9,7 +9,7 @@ export const lastPoints = [
 ];
 export const Common = {
     playerNum : 0,
-    nasket : 0,
+    basket : 0,
     addPlayerModal : null
 };
 

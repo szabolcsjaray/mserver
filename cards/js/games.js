@@ -87,6 +87,9 @@ Games.cgames = [
             [States.INITIAL, RuleAction.HIDE_CLASS, Html.PLAYER_OP_CLASS],
             [States.INITIAL, RuleAction.HIDE, Html.BASKET],
             [States.INITIAL, RuleAction.HIDE, Html.NEXT_BUTTON],
+            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.PLAY_BUTTON],
+            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.TURN_BUTTON],
+            [States.INITIAL, RuleAction.SHOW_CLASS, Html.POINT_CLASS],
 
             [States.TURN, RuleAction.MESSAGE, "Rendezzétek a pontokat és katt/nyom az JÁTÉK-ra!"],
             [States.TURN, RuleAction.SHOW_ALL, Html.DOWN_BUTTON],
@@ -114,6 +117,9 @@ Games.cgames = [
             [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.BASKET],
             [States.INITIAL, RuleAction.HIDE, Html.NEXT_BUTTON],
             [States.CLOSING, RuleAction.HIDE, Html.BASKET],
+            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.PLAY_BUTTON],
+            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.TURN_BUTTON],
+            [States.INITIAL, RuleAction.SHOW_CLASS, Html.POINT_CLASS],
 
             [States.PLAY, RuleAction.MESSAGE, "Dobjatok be egyet, ha kell!"],
             [States.PLAY, RuleAction.SHOW_ALL, Html.MINUS_1_BUTTON],

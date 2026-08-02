@@ -274,3 +274,17 @@
 .empty .menet {
     display: none;
 }
+
+.empty > .playerData > .point {
+    display: none;
+}
+
+#showRoleOverlay {
+    display: none;
+}
+
+#showRoleContent {
+    width: 90%;
+    height: 95%;
+    max-width: 90%;
+}
