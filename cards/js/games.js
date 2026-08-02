@@ -128,7 +128,7 @@ Games.cgames = [
             [States.PLAY, RuleAction.HIDE_ALL, Html.DROP_NUM_INPUT],
             [States.PLAY, RuleAction.HIDE_ALL, Html.MINUS_DROP_NUM_BUTTON],
 
-            [States.TURN, RuleAction.MESSAGE, "MIndenki dobjon be annyit, amennyi kártyája maradt!"],
+            [States.TURN, RuleAction.MESSAGE, "Mindenki dobjon be annyit, amennyi kártyája maradt!"],
             [States.TURN, RuleAction.HIDE_ALL, Html.MINUS_1_BUTTON],
             [States.TURN, RuleAction.SHOW_ALL, Html.DOWN_BUTTON],
             [States.TURN, RuleAction.SHOW_ALL, Html.UP_BUTTON],

@@ -17,6 +17,7 @@ export const City = {
             rImg.src = "img/" + CityPlayers.ROLES[i].img;
             rImg.className = Html.ROLE_ICON_CHOICE_CLASS;
             rImg.cityRole = CityPlayers.ROLES[i];
+            rImg.title = CityPlayers.ROLES[i].nev;
             el(Html.ACTIVE_ROLES).appendChild(rImg);
             rImg.onclick = City.moveRole;
         }
