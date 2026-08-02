@@ -288,3 +288,7 @@
     height: 95%;
     max-width: 90%;
 }
+
+img.showPlayerImg {
+    height: 20px;
+}

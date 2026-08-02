@@ -11,6 +11,7 @@ export const Html = {
     MINUS_1_BUTTON : "minus1",
     DOWN_BUTTON : "down",
     UP_BUTTON : "up",
+    DROP_IMG_CLASS : "dropImg",
     DROP_NUM_INPUT : "dropNum",
     MINUS_DROP_NUM_BUTTON : "minusM",
     PLAY_BUTTON : "game1",
@@ -32,8 +33,9 @@ export const Html = {
     SHOW_ROLE_IMG : "showRoleImg",
     SHOW_ROLE_NAME : "showRoleName",
     SHOW_ROLE_DESC : "showRoleDesc",
-    SHOW_ROLE_PLAYER : "showRolePlayer",
+    SHOW_ROLE_ROLE : "showRoleRole",
     SHOW_ROLE_CLOSE_BUTTON : "showRoleCloseButton",
+    SHO_ROLE_ICON : "showPlayerImg",
 
     DUMMY : ""
 };

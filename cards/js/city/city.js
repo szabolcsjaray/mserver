@@ -52,12 +52,22 @@ export const City = {
         }
     },
     showPlayer : function(evt) {
-        let id = evt.target.id[Html.SHOW_PLAYER_CLASS.length + 1];
+        let target = evt.target;
+        if (target.tagName == "IMG") {
+            target = target.parentElement;
+        }
+
+        let id = target.id[Html.SHOW_PLAYER_CLASS.length + 1];
         if (id >= Common.playerNum) return;
-        el(Html.SHOW_PLAYER_CLASS + "_" +id).style.backgroundColor = "#060";
+        el(Html.SHOW_PLAYER_CLASS + "_" +id).style.backgroundColor = "rgb(118, 170, 118)";
         City.showRole(id);
     },
     showRole : function(playerI) {
         let player = Players.players[playerI];
+        el(Html.SHOW_ROLE_WINDOW).style.display = "block";
+        el(Html.SHOW_ROLE_NAME).innerHTML = player.name;
+        el(Html.SHOW_ROLE_IMG).src = "img/" + player.role.img;
+        el(Html.SHOW_ROLE_ROLE).innerHTML = player.role.nev;
+        el(Html.SHOW_ROLE_DESC).innerHTML = player.role.desc;
     }
 }
