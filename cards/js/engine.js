@@ -43,6 +43,9 @@ export const Engine = {
                     case RuleAction.RUN :
                         actGame.rules[i][2]();
                         break;
+                    case RuleAction.DISABLE_BUTTON :
+                        el(actGame.rules[i][2]).disabled = true;
+                        break;
                     default:
                         console.log("Unknown rule action: " + actGame.rules[i][1] + " ("+i+". rule)");
                 }

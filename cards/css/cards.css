@@ -150,6 +150,11 @@
       background-color: #7ed321;
       color: #2424ae;
     }
+    
+    button.control:disabled {
+      background-color: #777777;
+      color: #40408f;
+    }
 
        /* Overlay that darkens the background */
     .modal-overlay {
@@ -212,8 +217,16 @@
       cursor: pointer;
     }
 
+    .open-btn:disabled {
+      background-color: #787879;
+    }
+
     .open-btn:hover {
       background-color: #0056b3;
+    }
+
+    .open-btn:disabled:hover {
+      background-color: #787879;
     }
 
     button.remove {
@@ -281,6 +294,7 @@
 
 #showRoleOverlay {
     display: none;
+    z-index: 2000;
 }
 
 #showRoleContent {
@@ -291,4 +305,20 @@
 
 img.showPlayerImg {
     height: 20px;
+}
+
+#firstNightOverlay {
+    display: none;
+}
+
+#firstNightKillersMeeting {
+    display: none;
+}
+
+#firstNightChameleon {
+    display: none;
+}
+
+#firstNightDirector {
+    display: none;
 }

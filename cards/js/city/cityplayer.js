@@ -14,7 +14,7 @@ export const CityPlayers = {
     BAKER : { id: 12, img: "loaf-of-bread-svgrepo-com.svg", nev: "Pék", desc: "Ha meghalsz, 3 körön belül végetér a játék a te győzelmeddel.", basic: false, evil: false},
     HOOVER : { id: 13, img: "vacuum-cleaner-svgrepo-com.svg", nev: "Porszívóügynök", desc: "Minden éjjel megajándékozol valakit egy porszívóval.", basic: false, evil: false},
     WATERGUN : { id: 14, img: "water-gun-svgrepo-com.svg", nev: "Vízipisztolyos", desc: "Minden éjjel valakit lelősz a vízipisztolyoddal. Ha ő kapott porszívót, meghal.", basic: false, evil: false},
-    CITIZEN : { id: 50, img: "", nev: "Polgár", desc: "Különleges képesség nélküli polgár vagy.", basic: false, evil: false},
+    CITIZEN : { id: 50, img: "house-svgrepo-com.svg", nev: "Polgár", desc: "Különleges képesség nélküli polgár vagy.", basic: false, evil: false},
     UNKNOWN : { id: 100, img: "severity-unknown-svgrepo-com.svg", nev: "", desc: "", basic: false, evil: false}
 }
 

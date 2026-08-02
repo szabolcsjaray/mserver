@@ -8,6 +8,7 @@ export const Html = {
     QUIT_ADD_PLAYER_BUTTON : "quitAddPlayerButton",
     GAME_NAME_DIV : "gameName",
     //player buttons
+    REMOVE_PLAYER_CLASS : "remove",
     MINUS_1_BUTTON : "minus1",
     DOWN_BUTTON : "down",
     UP_BUTTON : "up",
@@ -35,7 +36,20 @@ export const Html = {
     SHOW_ROLE_DESC : "showRoleDesc",
     SHOW_ROLE_ROLE : "showRoleRole",
     SHOW_ROLE_CLOSE_BUTTON : "showRoleCloseButton",
-    SHO_ROLE_ICON : "showPlayerImg",
+    SHOW_ROLE_ICON : "showPlayerImg",
+    CITIZEN_COUNT : "citizenCount",
+    FIRST_NIGHT_OVERLAY : "firstNightOverlay",
+    FIRST_NIGHT_CONTENT : "firstNightContent",
+    FIRST_NIGHT_KILLERS_MEETING : "firstNightKillersMeeting",
+    FIRST_NIGHT_CHAMELEON : "firstNightChameleon",
+    FIRST_NIGHT_DIRECTOR : "firstNightDirector",
+    FIRST_NIGHT_NEXT_BUTTON : "firstNightNextButton",
+    FIRST_NIGHT_CHAMELEON_BUTTON : "firstNightChameleonButton",
+    FIRST_NIGHT_DIRECTOR_BUTTON : "firstNightDirectorButton",
+    FIRST_NIGHT_KILLERS_MEETING_BUTTON : "firstNightKillersMeetingButton",
+    CHAMELEON_SELECT : "chameleonSelect",
+    DIRECTOR_SELECT : "directorSelect",
+  
 
     DUMMY : ""
 };

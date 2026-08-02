@@ -8,6 +8,7 @@ export const RuleAction = {
     MESSAGE : 6,
     HIDE_CLASS : 7,
     RUN : 8,
+    DISABLE_BUTTON : 9,
 
     ALLOW_MINUS_AT_DROP_NUM : 100,
     DROP_DECREASE_POINT: 101,

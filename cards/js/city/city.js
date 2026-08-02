@@ -9,6 +9,20 @@ export const City = {
     nextPhase : function() {
         Games.stepPhase();
     },
+    initGame : function() {
+        for (let i = 0; i < Common.playerNum; i++) {
+            Players.players[i].role = undefined;
+            Players.players[i].roleShowed = false;
+        }
+        City.setPlayerRoleIcons();
+        City.loadLastActiveRoles();
+    },
+    loadLastActiveRoles : function() {
+        let lastActiveRoles = localStorage.getItem("cards.lastActiveRoles");
+        if (lastActiveRoles) {
+            City.activeRoles = JSON.parse(lastActiveRoles).map(r => CityPlayers.ROLES.find(role => role.id === r));
+        }
+    },
     fillChooseRoles : function() {
         el(Html.ACTIVE_ROLES).innerHTML = "";
         el(Html.PASSIVE_ROLES).innerHTML = "";
@@ -18,12 +32,21 @@ export const City = {
             rImg.className = Html.ROLE_ICON_CHOICE_CLASS;
             rImg.cityRole = CityPlayers.ROLES[i];
             rImg.title = CityPlayers.ROLES[i].nev;
-            el(Html.ACTIVE_ROLES).appendChild(rImg);
+            if (City.activeRoles.find(r => r.id === CityPlayers.ROLES[i].id) || CityPlayers.ROLES[i].basic) {
+                el(Html.ACTIVE_ROLES).appendChild(rImg);
+            } else {
+                el(Html.PASSIVE_ROLES).appendChild(rImg);
+            }
             rImg.onclick = City.moveRole;
         }
+        City.checkRoles();
     },
     moveRole : function(evt) {
         let img = evt.target;
+        let role = img.cityRole;
+        if (role.basic) {
+                return;
+        }
         let parentDiv = img.parentElement;
         img.remove();
         if (parentDiv.id == Html.ACTIVE_ROLES) {
@@ -31,6 +54,17 @@ export const City = {
         } else {
             el(Html.ACTIVE_ROLES).appendChild(img);
         }
+        City.checkRoles();
+    },
+    checkRoles : function() {
+        let activeRolesDiv = el(Html.ACTIVE_ROLES);
+        if (activeRolesDiv.children.length > Common.playerNum) {
+            el(Html.ROLES_SELECTED_BUTTON).disabled = true;
+            el(Html.CITIZEN_COUNT).innerHTML = "0";
+            return;
+        }
+        el(Html.CITIZEN_COUNT).innerHTML = (Common.playerNum - activeRolesDiv.children.length).toString();
+        el(Html.ROLES_SELECTED_BUTTON).disabled = false;
     },
     saveActiveRoles : function() {
         City.activeRoles = [];
@@ -41,6 +75,17 @@ export const City = {
                 City.activeRoles.push(child.cityRole);
             }
         }
+        localStorage.setItem("cards.lastActiveRoles", JSON.stringify(City.activeRoles.map(r => r.id)));
+    },
+    setPlayerRoleIcons : function() {
+        for (let i = 0; i < Common.playerNum; i++) {
+            let player = Players.players[i];
+            if (player.role) {
+                el(Html.ROLE_ICON + "_" + i).src = "img/" + player.role.img;
+            } else {
+                el(Html.ROLE_ICON + "_" + i).src = "img/severity-unknown-svgrepo-com.svg";
+            }
+        }
     },
     setRandomRoles : function() {
         for(let i = 0; i <= City.activeRoles.length - 1; i++) {
@@ -48,8 +93,13 @@ export const City = {
             let [player, playerFoundIndex] = Players.findFreePlayer(playerI);
             City.activeRoles[i].player = player;
             player.role = City.activeRoles[i];
-            el(Html.ROLE_ICON + "_" + playerFoundIndex).src = "img/" + City.activeRoles[i].img;
         }
+        for(let i = 0; i < Common.playerNum; i++) {
+            if (Players.players[i].role == undefined) {
+                Players.players[i].role = CityPlayers.CITIZEN;
+            }
+        }
+        City.setPlayerRoleIcons();
     },
     showPlayer : function(evt) {
         let target = evt.target;
@@ -64,10 +114,64 @@ export const City = {
     },
     showRole : function(playerI) {
         let player = Players.players[playerI];
+        player.roleShowed = true;
         el(Html.SHOW_ROLE_WINDOW).style.display = "block";
         el(Html.SHOW_ROLE_NAME).innerHTML = player.name;
         el(Html.SHOW_ROLE_IMG).src = "img/" + player.role.img;
         el(Html.SHOW_ROLE_ROLE).innerHTML = player.role.nev;
         el(Html.SHOW_ROLE_DESC).innerHTML = player.role.desc;
+        City.enableNextButtonIfAllRolesShowed();
+    },
+    enableNextButtonIfAllRolesShowed : function() {
+        let allShowed = true;
+        for (let i = 0; i < Common.playerNum; i++) {
+            if (!Players.players[i].roleShowed) {
+                allShowed = false;
+                break;
+            }
+        }
+        el(Html.NEXT_BUTTON).disabled = !allShowed;
+    },
+    firstNightChameleon : function() {
+        el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = true;
+        let chameleon = Players.players.find(p => p.role == CityPlayers.CHAMELEON);
+        if (chameleon) {
+            el(Html.FIRST_NIGHT_CHAMELEON).style.display = "block";
+            el(Html.FIRST_NIGHT_CHAMELEON_BUTTON).onclick = () => {
+                City.showRole(el(Html.CHAMELEON_SELECT).value);
+                City.firstNightDirector();
+            };
+            for (let i = 0; i < Common.playerNum; i++) {
+                if (Players.players[i].role != CityPlayers.CHAMELEON) {
+                    el(Html.CHAMELEON_SELECT).innerHTML += "<option value='" + i + "'>" + Players.players[i].name + "</option>";
+                }
+            }
+        } else {
+            City.firstNightDirector();
+        }
+    },
+    firstNightDirector : function() {
+        let director = Players.players.find(p => p.role == CityPlayers.DIRECTOR);
+        if (director) {
+            el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+            el(Html.FIRST_NIGHT_DIRECTOR).style.display = "block";
+            el(Html.FIRST_NIGHT_DIRECTOR_BUTTON).onclick = () => {
+                City.showRole(el(Html.DIRECTOR_SELECT).value);
+                City.firstNightKillersMeeting();
+            };
+            for (let i = 0; i < Common.playerNum; i++) {
+                if (Players.players[i].role != CityPlayers.DIRECTOR) {
+                    el(Html.DIRECTOR_SELECT).innerHTML += "<option value='" + i + "'>" + Players.players[i].name + "</option>";
+                }
+            }
+        } else {
+            City.firstNightKillersMeeting();
+        }
+    },
+    firstNightKillersMeeting : function() {
+        el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
+        el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+        el(Html.FIRST_NIGHT_KILLERS_MEETING).style.display = "block";
+        el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
     }
-}
+};

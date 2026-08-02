@@ -12,7 +12,6 @@ function init() {
   el(Html.PLAY_BUTTON).onclick = gameMode;
   el(Html.TURN_BUTTON).onclick = countingMode;
   el("player").onclick = addPlayer;
-  el("newName").onchange = doAddPlayer;
   el("newGame").onclick = startNewGame;
   el(Html.NEXT_BUTTON).onclick = City.nextPhase;
   el(Html.ROLES_SELECTED_BUTTON).onclick = City.nextPhase;
@@ -220,7 +219,7 @@ function fillBoxes() {
         + "<input class=\"dropNum playerOp\" type=\"number\" min=\"-7\" style=\"display: inline-block;\" id=\"dropNum_"+i+"\">"
         + "<button class=\"minusM playerOp\" style=\"display: inline-block;\" id=\"up_"+i+"\"> &uarr; </button>"
         + "<button class=\"minusM playerOp\" style=\"display: inline-block;\" id=\"minusM_"+i+"\">"
-        + "<img src=\"img/Curved-Arrow.svg\" class=\"" + Html.DROP_IMG_CLASS + "\"></button>" 
+        + "<img src=\"img/Curved_Arrow.svg\" class=\"" + Html.DROP_IMG_CLASS + "\"></button>" 
         + "<button class=\"showPlayer playerOp\" id=\"showPlayer_"+i+"\">" 
             + "<img src=\"img/eye-svgrepo-com.svg\" class=\"showPlayerImg\">"
         + "</button>"

@@ -8,12 +8,13 @@ import { makeOption } from './cards.js';
 
 export const Games = {
     Game : class {
-        constructor(name, states, rules, startPoint, endPoint) {
+        constructor(name, states, rules, startPoint, endPoint, loopPhase = null) {
             this.name = name;
             this.states = states;
             this.rules = rules;
             this.startPoint = startPoint;
             this.endPoint = endPoint;
+            this.loopPhase = loopPhase;
         }
     },
     // games
@@ -44,7 +45,7 @@ export const Games = {
         Games.phase = States.INITIAL;
         Engine.runPhase();
 
-        Games.setPhase(States.PLAY);
+        Games.stepPhase();
     },
     changeTheGame() {
         if (el(Html.SELECT_GAME).value != Games.running) {
@@ -72,7 +73,12 @@ export const Games = {
         let game = Games.cgames[Games.running];
         let i = game.states.indexOf(Games.phase);
         i++;
-        if (i >= game.states.length || i == -1) {
+        if (i >= game.states.length || i == -1 ) {
+            if (game.loopPhase != null 
+                && game.states.indexOf(game.loopPhase) != -1 
+                && i != -1) {
+                i = game.states.indexOf(game.loopPhase);
+            }
             i = 0;
         }
         Games.setPhase(game.states[i]);
@@ -146,7 +152,10 @@ Games.cgames = [
     ),
     new Games.Game(
         "Alszik a város",
-        [States.CHOOSE_ROLES, States.SHOW_PLAYERS, States.FIRST_NIGHT, States.DAY, States.NIGHT, States.MORNING],
+        [
+            States.CHOOSE_PLAYERS,
+            States.CHOOSE_ROLES, States.SHOW_PLAYERS, States.FIRST_NIGHT,
+            States.DAY, States.NIGHT, States.MORNING],
         [
             [States.INITIAL, RuleAction.HIDE, Html.BASKET],
             [States.INITIAL, RuleAction.HIDE, Html.PLAY_BUTTON],
@@ -154,9 +163,12 @@ Games.cgames = [
             [States.INITIAL, RuleAction.HIDE_CLASS, Html.PLAYER_OP_CLASS],
             [States.INITIAL, RuleAction.HIDE_CLASS, Html.POINT_CLASS],
             [States.INITIAL, RuleAction.SHOW_CLASS, Html.ROLE_ICON_CLASS],
-            [States.INITIAL, RuleAction.SHOW_INLINE_BLOCK, Html.NEXT_BUTTON],
-            [States.INITIAL, RuleAction.MESSAGE, "Válogasd össze a játékosokat, majd Tovább gomb!"],
+            [States.INITIAL, RuleAction.RUN, City.initGame],
 
+            [States.CHOOSE_PLAYERS, RuleAction.SHOW_INLINE_BLOCK, Html.NEXT_BUTTON],
+            [States.CHOOSE_PLAYERS, RuleAction.MESSAGE, "Válogasd össze a játékosokat, majd Tovább gomb!"],
+
+            [States.CHOOSE_ROLES, RuleAction.HIDE_CLASS, Html.REMOVE_PLAYER_CLASS],
             [States.CHOOSE_ROLES, RuleAction.MESSAGE, "Válogasd össze a szerepeket, majd Tovább gomb!"],
             [States.CHOOSE_ROLES, RuleAction.RUN, City.fillChooseRoles],
             [States.CHOOSE_ROLES, RuleAction.SHOW, Html.CHOOSE_ROLES_OVERLAY],
@@ -165,12 +177,19 @@ Games.cgames = [
             [States.SHOW_PLAYERS, RuleAction.HIDE, Html.CHOOSE_ROLES_OVERLAY],
             [States.SHOW_PLAYERS, RuleAction.RUN, City.setRandomRoles],
 
+            [States.SHOW_PLAYERS, RuleAction.DISABLE_BUTTON, Html.NEXT_BUTTON],
             [States.SHOW_PLAYERS, RuleAction.SHOW_ALL, Html.SHOW_PLAYER_CLASS],
             [States.SHOW_PLAYERS, RuleAction.MESSAGE, "Mutasd meg egyesével a játékosoknak a szerepüket!"],
 
-            [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS]
+            [States.FIRST_NIGHT, RuleAction.MESSAGE, "Első éjszaka, kövesd az utasításokat!"],
+            [States.FIRST_NIGHT, RuleAction.SHOW, Html.FIRST_NIGHT_OVERLAY],
+            [States.FIRST_NIGHT, RuleAction.RUN, City.firstNightChameleon],
+
+            [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS],
+            [States.CLOSING, RuleAction.SHOW_CLASS, Html.REMOVE_PLAYER_CLASS]
         ],
         0,
-        0
+        0,
+        States.DAY
     )
 ];

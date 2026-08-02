@@ -4,6 +4,7 @@ export const States = {
     TURN : 1,
     SELECT_WINNER : 2,
 
+    CHOOSE_PLAYERS: 15,
     CHOOSE_ROLES: 14,
     SHOW_PLAYERS: 13,
     FIRST_NIGHT: 9,
