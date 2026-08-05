@@ -32,6 +32,7 @@ export const City = {
             rImg.className = Html.ROLE_ICON_CHOICE_CLASS;
             rImg.cityRole = CityPlayers.ROLES[i];
             rImg.title = CityPlayers.ROLES[i].nev;
+            rImg.id = "picon_" + CityPlayers.ROLES[i].id;
             if (City.activeRoles.find(r => r.id === CityPlayers.ROLES[i].id) || CityPlayers.ROLES[i].basic) {
                 el(Html.ACTIVE_ROLES).appendChild(rImg);
             } else {
@@ -44,15 +45,22 @@ export const City = {
     moveRole : function(evt) {
         let img = evt.target;
         let role = img.cityRole;
+        let pair = role.id === 13 ? 14 : role.id === 14 ? 13 : false;
+        let pairIcon = pair ? el("picon_"+pair) : null;
         if (role.basic) {
                 return;
         }
         let parentDiv = img.parentElement;
         img.remove();
+        if (pair) {
+            el("picon_"+pair).remove;
+        }
         if (parentDiv.id == Html.ACTIVE_ROLES) {
             el(Html.PASSIVE_ROLES).appendChild(img);
+            if (pair) el(Html.PASSIVE_ROLES).appendChild(pairIcon);
         } else {
             el(Html.ACTIVE_ROLES).appendChild(img);
+            if (pair) el(Html.ACTIVE_ROLES).appendChild(pairIcon);
         }
         City.checkRoles();
     },
@@ -118,7 +126,7 @@ export const City = {
         el(Html.SHOW_ROLE_WINDOW).style.display = "block";
         el(Html.SHOW_ROLE_NAME).innerHTML = player.name;
         el(Html.SHOW_ROLE_IMG).src = "img/" + player.role.img;
-        el(Html.SHOW_ROLE_ROLE).innerHTML = player.role.nev;
+        el(Html.SHOW_ROLE_ROLE).innerHTML = player.role.nev.toUpperCase();
         el(Html.SHOW_ROLE_DESC).innerHTML = player.role.desc;
         City.enableNextButtonIfAllRolesShowed();
     },

@@ -312,6 +312,37 @@
     width: 98%;
     height: 95%;
     max-width: 98%;
+    font-size: max(1.4vw, 1.1em);
+    background-image: url(./../img/paperback.jpg);
+	  background-size: cover;
+    border: brown outset 5px;
+    border-radius: 10px;
+    color: darkslategray;
+}
+
+#modalTitle {
+  text-decoration: underline;
+}
+
+#showRoleName {
+  color: cornflowerblue;
+  font-size: max(1.8vw, 1.6em);
+}
+
+#showRoleRole {
+  color: fuchsia;
+  text-shadow: -1px -1px 0 yellow, 1px -1px 0 yellow, -1px 1px 0 yellow, 1px 1px 0 yellow;
+  font-size: max(2vw, 1.7em);
+  margin-top: 10px;
+}
+
+#showRoleImg {
+  width: min(40vw, 180px);
+    border: 4px outset lightcyan;
+    outline: none;
+    background-color: paleturquoise;
+    margin: 0 auto 20px;
+    padding: 10px;
 }
 
 img.showPlayerImg {

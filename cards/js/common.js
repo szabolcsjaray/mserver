@@ -32,3 +32,76 @@ export function isVisible(id) {
         || element.style.display == null
         || element.style.display == "none");
 }
+
+//Gergő's basic functions - export if needed
+
+let rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+let shuffle = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+};
+
+let capital = (txt) => txt.charAt(0).toUpperCase() + txt.slice(1);
+
+function nevelos(str, nagy = false) {
+    let ne = nagy ? "A" : "a";
+    ne += (/[öüóeuioőúaéáűí]/i.test(str.charAt(0))) ? "z " : " ";
+    return ne + str;
+}
+
+let tized = (v) => Math.round(v * 10) / 10;
+
+let checkItem = (arr, it) => arr.indexOf(it) > -1;
+
+let checkItemDeep = (arr, prop, it) => arr.findIndex((a) => a[prop] === it) > -1;
+
+let delItem = (arr, it) => {
+    for (let n = 0; n < arr.length; n++) {
+        if (arr[n] == it) {
+            arr.splice(n, 1);
+            n--;
+        }
+    }
+}
+
+let delItemDeep = (arr, prop, it) => {
+    for (let n = 0; n < arr.length; n++) {
+        if (arr[n][prop] == it) {
+            arr.splice(n, 1);
+            n--;
+        }
+    }
+}
+
+let getObj = (arr, prop, it) => {
+    let r = arr.findIndex((a) => a[prop] === it);
+    if (r > -1) {
+        return arr[r];
+    } else {
+        return false;
+    }
+};
+
+let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] === it);
+
+let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
+
+let checkListItem = (arr, prop, it) => {
+    let r = false;
+    for (const a of arr) {
+        if (checkItem(a[prop], it)) r = true;
+    }
+    return r;
+}
+
+let getListItems = (arr, prop, it) => {
+    let r = [];
+    for (const a of arr) {
+        if (checkItem(a[prop], it)) r.push(a);
+    }
+    return r;
+}
