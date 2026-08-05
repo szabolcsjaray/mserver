@@ -172,6 +172,27 @@ export const City = {
         el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
         el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
         el(Html.FIRST_NIGHT_KILLERS_MEETING).style.display = "block";
+        el(Html.FIRST_NIGHT_KILLERS_MEETING_BUTTON).style.display = "none";
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
+        el(Html.FIRST_NIGHT_NEXT_BUTTON).onclick = () => {
+            el(Html.FIRST_NIGHT_OVERLAY).style.display = "none";
+            Games.stepPhase();
+        }
+    },
+    hangPlayer : function(evt) {
+        let target = evt.target;
+        if (target.tagName == "IMG") {
+            target = target.parentElement;
+        }
+        let id = target.id[Html.HANG_PLAYER_BUTTON.length + 1];
+        if (id >= Common.playerNum) return;
+
+        if (Players.players[id].alive === false) return;
+
+        Players.players[id].alive = false;
+        el(Html.BOX + id).style.backgroundColor = "rgb(107, 92, 92)";
+        el(Html.NAME + id).style.color = "rgb(0,0,0)";
+        //TODO check and of game, show winner
+        Games.stepPhase();
     }
 };

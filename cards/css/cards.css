@@ -126,6 +126,17 @@
         top: -3px;
     }
 
+    .hanging {
+        display: none;
+        margin: 3px;
+        border-radius: 10px;
+        background-color: rgb(238, 255, 116);;
+        font-size: 20px;
+        padding: 4px;
+        position: relative;
+        top: -3px;
+    }
+
     #pont {
         display: inline-block;
 
@@ -298,9 +309,9 @@
 }
 
 #showRoleContent {
-    width: 90%;
+    width: 98%;
     height: 95%;
-    max-width: 90%;
+    max-width: 98%;
 }
 
 img.showPlayerImg {

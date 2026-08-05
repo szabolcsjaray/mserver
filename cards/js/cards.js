@@ -223,6 +223,9 @@ function fillBoxes() {
         + "<button class=\"showPlayer playerOp\" id=\"showPlayer_"+i+"\">" 
             + "<img src=\"img/eye-svgrepo-com.svg\" class=\"showPlayerImg\">"
         + "</button>"
+        + "<button class=\"hanging playerOp\" id=\"hangPlayer_"+i+"\">" 
+        + "<img src=\"img/skull-and-bones-svgrepo-com.svg\" class=\"showPlayerImg\">"
+        + "</button>"
         + "</div>"
         + "<button class=\"menet remove\" id=\"playerRemove"+i+"\"> X </button>";
       el("box"+i).innerHTML = html;
@@ -234,7 +237,7 @@ function fillBoxes() {
       el("playerRemove"+i).onclick = playerRemove;
       el("dropNum_"+i).onfocus = zeroField;
       el(Html.SHOW_PLAYER_CLASS + "_" + i).onclick = City.showPlayer;
-
+      el(Html.HANG_PLAYER_BUTTON + "_" + i).onclick = City.hangPlayer;
       multiDrop(i, 0);
       setName(i, "---");
   }

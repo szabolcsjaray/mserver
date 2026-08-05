@@ -12,6 +12,9 @@ Players.lastPlayers = []; // stores the actual player list, stored as lastPlayer
 Players.Player = class Player {
     constructor(name) {
         this.name = name;
+        this.alive = true;
+        this.role = undefined;
+        this.roleShowed = false;
     }
 };
 

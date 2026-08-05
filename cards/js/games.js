@@ -78,8 +78,9 @@ export const Games = {
                 && game.states.indexOf(game.loopPhase) != -1 
                 && i != -1) {
                 i = game.states.indexOf(game.loopPhase);
+            } else {
+                i = 0;
             }
-            i = 0;
         }
         Games.setPhase(game.states[i]);
     }
@@ -184,6 +185,14 @@ Games.cgames = [
             [States.FIRST_NIGHT, RuleAction.MESSAGE, "Első éjszaka, kövesd az utasításokat!"],
             [States.FIRST_NIGHT, RuleAction.SHOW, Html.FIRST_NIGHT_OVERLAY],
             [States.FIRST_NIGHT, RuleAction.RUN, City.firstNightChameleon],
+
+            [States.DAY, RuleAction.MESSAGE, "Nappal van, mindenki ébren!"],
+            [States.DAY, RuleAction.SHOW_ALL, Html.HANG_PLAYER_BUTTON],
+
+            [States.NIGHT, RuleAction.MESSAGE, "Éjszaka van, mindenki aludjon!"],
+            [States.NIGHT, RuleAction.HIDE_ALL, Html.HANG_PLAYER_BUTTON],
+
+            [States.MORNING, RuleAction.MESSAGE, "Reggel van, mindenki ébredjen fel!"],
 
             [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS],
             [States.CLOSING, RuleAction.SHOW_CLASS, Html.REMOVE_PLAYER_CLASS]

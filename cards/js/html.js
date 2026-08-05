@@ -49,7 +49,10 @@ export const Html = {
     FIRST_NIGHT_KILLERS_MEETING_BUTTON : "firstNightKillersMeetingButton",
     CHAMELEON_SELECT : "chameleonSelect",
     DIRECTOR_SELECT : "directorSelect",
-  
-
+    HANG_PLAYER_CLASS : "hanging",
+    HANG_PLAYER_IMG : "hangPlayerImg",
+    HANG_PLAYER_BUTTON : "hangPlayer",
+    BOX : "box",
+    NAME: "name",
     DUMMY : ""
 };
