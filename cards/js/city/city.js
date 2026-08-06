@@ -6,6 +6,8 @@ import { Players } from '../player.js';
 
 export const City = {
     activeRoles : [],
+    hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
+    countdown: 0, //starts counting until 3 if Baker killed (actually, counting up, but it doesn't matter)
     nextPhase : function() {
         Games.stepPhase();
     },
@@ -106,8 +108,10 @@ export const City = {
             if (Players.players[i].role == undefined) {
                 Players.players[i].role = CityPlayers.CITIZEN;
             }
+            //TODO: Initialize Player objects based on Roles
         }
         City.setPlayerRoleIcons();
+        console.log("Players: ", Players.players);
     },
     showPlayer : function(evt) {
         let target = evt.target;
@@ -194,10 +198,11 @@ export const City = {
         }
         let id = target.id[Html.HANG_PLAYER_BUTTON.length + 1];
         if (id >= Common.playerNum) return;
-
         if (Players.players[id].alive === false) return;
-
         Players.players[id].alive = false;
+        let lover = Players.players[id].lover;
+        if (lover > -1) Players.players[lover].alive = false;
+        //TODO: GM:announce other death
         el(Html.BOX + id).style.backgroundColor = "rgb(107, 92, 92)";
         el(Html.NAME + id).style.color = "rgb(0,0,0)";
         //TODO check and of game, show winner

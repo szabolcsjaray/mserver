@@ -15,6 +15,15 @@ Players.Player = class Player {
         this.alive = true;
         this.role = undefined;
         this.roleShowed = false;
+        this.evil = false; //gyilkos vagy maffiavezér
+        this.chameleon = false; 
+        this.killed = false; //to be killed (by evils or witch) at night
+        this.saved = false; //to be saved (by doctor, witch or neighbor) at night
+        this.lover = -1; //id of lover connected by cupid
+        this.neighbor = -1; //id of current target of Neighbor
+        this.preneigh = -1; //id of previous target of Neighbor
+        this.getHoover = false; //gets hoover at night
+        this.getWater = false; //gets watergun shot at night
     }
 };
 
