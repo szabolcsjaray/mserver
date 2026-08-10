@@ -33,8 +33,8 @@ Players.addPlayer = function (playerName) {
         player = new Players.Player(playerName);
         Players.players.push(player);
         Players.saveStoredPlayers();
-        Engine.runPhase();
     }
+    Engine.runPhase();
     return player;
 };
 
@@ -57,8 +57,10 @@ Players.readLastPlayers = function() {
         item = "[]";
     }
     Players.lastPlayers = JSON.parse(item);
-    for(let i = 0; i < Players.lastPlayers.length; i++) {
-        doAddPlayer(Players.lastPlayers[i]);
+    if (item.length > 0) {
+        for(let i = 0; i < Players.lastPlayers.length; i++) {
+            doAddPlayer(Players.lastPlayers[i]);
+        }
     }
 };
 

@@ -92,8 +92,8 @@ function playerRemove(evt) {
     points.push(0);
     for(let i = id; i < Common.playerNum+1; i++) {
       let nextI = i+1;
-      if (nextI >= 9) {
-        el("name9").innerHTML = "---";
+      if (nextI >= Common.playerNum) {
+        el("name" + i).innerHTML = "---";
       } else {
         el("name" + i).innerHTML = el("name" + nextI).innerHTML;
       }
@@ -146,7 +146,11 @@ function doMinus1(evt){
 }
 
 function doMinusM(evt){
-  let id = evt.target.id[7];
+  let target = evt.target;
+  if (target.tagName == "IMG") {
+      target = target.parentElement;
+  }
+  let id = target.id[7];
   if (id >= Common.playerNum) return;
   let factor = (Engine.getValue(RuleAction.DROP_DECREASE_POINT) ? -1 : 1);
   if (!Engine.getValue(RuleAction.ALLOW_MINUS_AT_DROP_NUM) && el(Html.DROP_NUM_INPUT + "_"+id).value < 0) {
@@ -251,6 +255,14 @@ function colorPlayerBlocks() {
     } else {
       el("box" + i).style.backgroundColor = "grey";
       el("box" + i).classList.add("empty");
+      el("minus1_" + i).style.display = "none";
+      el("minusM_" + i).style.display = "none";
+      el("up_" + i).style.display = "none";
+      el("down_" + i).style.display = "none";
+      el("dropNum_" + i).style.display = "none";
+      el("showPlayer_" + i).style.display = "none";
+      el("hangPlayer_" + i).style.display = "none";
+      el("pont" + i).style.display = "none";
     }
   }
 }

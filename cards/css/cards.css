@@ -299,6 +299,14 @@
     display: none;
 }
 
+.empty > .playerData > .dropNum {
+    display: none;
+}
+
+.empty > .playerData > .minus1 {
+    display: none;
+}
+
 .empty > .playerData > .point {
     display: none;
 }
