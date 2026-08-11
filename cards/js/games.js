@@ -2,7 +2,7 @@ import { el }from './common.js';
 import { States } from './states.js';
 import { RuleAction } from './rules.js';
 import { Html } from './html.js';
-import {City } from './city/city.js';
+import { City } from './city/city.js';
 import { Engine } from './engine.js';
 import { makeOption } from './cards.js';
 
@@ -188,11 +188,12 @@ Games.cgames = [
 
             [States.DAY, RuleAction.MESSAGE, "Nappal van, mindenki ébren!"],
             [States.DAY, RuleAction.SHOW_ALL, Html.HANG_PLAYER_BUTTON],
-
+            
             [States.NIGHT, RuleAction.MESSAGE, "Éjszaka van, mindenki aludjon!"],
             [States.NIGHT, RuleAction.HIDE_ALL, Html.HANG_PLAYER_BUTTON],
 
             [States.MORNING, RuleAction.MESSAGE, "Reggel van, mindenki ébredjen fel!"],
+            [States.MORNING, RuleAction.RUN, City.morningCalculations],
 
             [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS],
             [States.CLOSING, RuleAction.SHOW_CLASS, Html.REMOVE_PLAYER_CLASS]

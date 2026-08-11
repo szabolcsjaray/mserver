@@ -7,7 +7,9 @@ import { Players } from '../player.js';
 export const City = {
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
-    countdown: 0, //starts counting until 3 if Baker killed (actually, counting up, but it doesn't matter)
+    day: 0,
+    countdown: 0, //starts counting until 3 if Baker killed
+    forecast: 0,
     nextPhase : function() {
         Games.stepPhase();
     },
@@ -105,13 +107,33 @@ export const City = {
             player.role = City.activeRoles[i];
         }
         for(let i = 0; i < Common.playerNum; i++) {
-            if (Players.players[i].role == undefined) {
-                Players.players[i].role = CityPlayers.CITIZEN;
+            let p = Players.players[i];
+            switch (p.role) {
+                case undefined:
+                    p.role = CityPlayers.CITIZEN;
+                    break;
+                
+                case CityPlayers.CHAMELEON:
+                    p.chameleon = true;
+                    break;
+            
+                case CityPlayers.HOOVER:
+                    City.hoovergun++;
+                    break;
+            
+                case CityPlayers.WATERGUN:
+                    City.hoovergun++;
+                    break;
+            
+                default:
+                    break;
             }
-            //TODO: Initialize Player objects based on Roles
         }
+
         City.setPlayerRoleIcons();
+        //TEST HUNGLOVER: Players.players[0].lover = 1;
         console.log("Players: ", Players.players);
+        console.log("HOOOVERGUN: ", City.hoovergun);
     },
     showPlayer : function(evt) {
         let target = evt.target;
@@ -180,6 +202,7 @@ export const City = {
             City.firstNightKillersMeeting();
         }
     },
+    //TODO:firstnight forecaster
     firstNightKillersMeeting : function() {
         el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
         el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
@@ -201,11 +224,23 @@ export const City = {
         if (Players.players[id].alive === false) return;
         Players.players[id].alive = false;
         let lover = Players.players[id].lover;
-        if (lover > -1) Players.players[lover].alive = false;
-        //TODO: GM:announce other death
+        if (lover > -1) {
+            Players.players[lover].alive = false;
+            el(Html.DAY_OVERLAY).style.display="block";
+            el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
+            el(Html.BOX + lover).style.backgroundColor = "rgb(107, 92, 92)";
+            el(Html.NAME + id).style.color = "rgb(0,0,0)";
+            el(Html.DAY_NEXT_BUTTON).onclick = () => {
+               el(Html.DAY_OVERLAY).style.display = "none";
+            }
+        }
         el(Html.BOX + id).style.backgroundColor = "rgb(107, 92, 92)";
         el(Html.NAME + id).style.color = "rgb(0,0,0)";
-        //TODO check and of game, show winner
+        //TODO check end of game (also forecast), show winner
         Games.stepPhase();
+    },
+    morningCalculations : function() {
+        City.day++;
+        //TODO: all calculations
     }
 };

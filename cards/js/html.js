@@ -52,6 +52,9 @@ export const Html = {
     HANG_PLAYER_CLASS : "hanging",
     HANG_PLAYER_IMG : "hangPlayerImg",
     HANG_PLAYER_BUTTON : "hangPlayer",
+    DAY_OVERLAY : "dayOverlay",
+    HUNG_LOVER_NAME : "hungLoverName",
+    DAY_NEXT_BUTTON : "dayNextButton",
     BOX : "box",
     NAME: "name",
     DUMMY : ""

@@ -14,6 +14,8 @@ export const CityPlayers = {
     BAKER : { id: 12, img: "loaf-of-bread-svgrepo-com.svg", nev: "Pék", desc: "Ha meghalsz, 3 körön belül végetér a játék a te győzelmeddel.", basic: false, evil: false},
     HOOVER : { id: 13, img: "vacuum-cleaner-svgrepo-com.svg", nev: "Porszívóügynök", desc: "Minden éjjel megajándékozol valakit egy porszívóval.", basic: false, evil: false},
     WATERGUN : { id: 14, img: "water-gun-svgrepo-com.svg", nev: "Vízipisztolyos", desc: "Minden éjjel valakit lelősz a vízipisztolyoddal. Ha ő kapott porszívót, meghal.", basic: false, evil: false},
+    HALFBRO : { id: 15, img: "two-shadows-svgrepo-com.svg", nev: "Féltestvér", desc: "Látszólag polgár vagy, de a célod, hogy a gyilkosok nyerjenek.", basic: false, evil: true},
+    FORECASTER : { id: 16, img: "fortune-teller-svgrepo-com.svg", nev: "Időjós", desc: "Jósold meg előre, hanyadik körben ér véget a játék! Ha ezt eléred, nyersz.", basic: false, evil: false},
     CITIZEN : { id: 50, img: "house-svgrepo-com.svg", nev: "Polgár", desc: "Különleges képesség nélküli polgár vagy.", basic: false, evil: false},
     UNKNOWN : { id: 100, img: "severity-unknown-svgrepo-com.svg", nev: "", desc: "", basic: false, evil: false}
 }
@@ -21,7 +23,7 @@ export const CityPlayers = {
 CityPlayers.ROLES = [ CityPlayers.KILLER, CityPlayers.MAFFIA, CityPlayers.POLICE,
              CityPlayers.DOCTOR, CityPlayers.CUPIDO, CityPlayers.DIRECTOR,
              CityPlayers.NEIGHBOUR, CityPlayers.CHAMELEON, CityPlayers.CLOWN,
-             CityPlayers.PRIEST, CityPlayers.WITCH, CityPlayers.BAKER, CityPlayers.HOOVER, CityPlayers.WATERGUN
+             CityPlayers.PRIEST, CityPlayers.WITCH, CityPlayers.BAKER, CityPlayers.HOOVER, CityPlayers.WATERGUN, CityPlayers.HALFBRO, CityPlayers.FORECASTER
 ];
 
 console.log("CityPlayers read.");

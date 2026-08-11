@@ -372,3 +372,7 @@ img.showPlayerImg {
 #firstNightDirector {
     display: none;
 }
+
+#dayOverlay {
+    display: none;
+}

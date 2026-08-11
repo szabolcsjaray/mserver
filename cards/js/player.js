@@ -23,7 +23,9 @@ Players.Player = class Player {
         this.neighbor = -1; //id of current target of Neighbor
         this.preneigh = -1; //id of previous target of Neighbor
         this.getHoover = false; //gets hoover at night
+        this.gotHoover = false; //got hoover at night earlier
         this.getWater = false; //gets watergun shot at night
+        this.usedResurrect = false; //priest used resurrect
     }
 };
 
