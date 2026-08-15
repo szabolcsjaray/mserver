@@ -338,14 +338,14 @@
 }
 
 #showRoleRole {
-  color: tomato;
-  text-shadow: -1px -1px 0 lightskyblue, 1px -1px 0 lightskyblue, -1px 1px 0 lightskyblue, 1px 1px 0 lightskyblue;
+  color: orange;
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   font-size: max(2vw, 1.7em);
   margin-top: 10px;
 }
 
 #showRoleImg {
-  width: min(40vw, 180px);
+  width: min(40vw, 30vh, 150px);
     border: 4px outset lightcyan;
     outline: none;
     background-color: paleturquoise;
@@ -373,6 +373,14 @@ img.showPlayerImg {
     display: none;
 }
 
+#firstNightForecaster {
+    display: none;
+}
+
 #dayOverlay {
     display: none;
+}
+
+#chameleon-text {
+    font-size: 0.7em;
 }

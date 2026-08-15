@@ -149,10 +149,14 @@ export const City = {
     showRole : function(playerI) {
         let player = Players.players[playerI];
         player.roleShowed = true;
+        let shr = player.role.nev.toUpperCase();
+        if (player.chameleon && player.role != CityPlayers.CHAMELEON) {
+            shr += "<br><span id='chameleon-text'>(kaméleon)</span>";
+        }
         el(Html.SHOW_ROLE_WINDOW).style.display = "block";
         el(Html.SHOW_ROLE_NAME).innerHTML = player.name;
         el(Html.SHOW_ROLE_IMG).src = "img/" + player.role.img;
-        el(Html.SHOW_ROLE_ROLE).innerHTML = player.role.nev.toUpperCase();
+        el(Html.SHOW_ROLE_ROLE).innerHTML = shr;
         el(Html.SHOW_ROLE_DESC).innerHTML = player.role.desc;
         City.enableNextButtonIfAllRolesShowed();
     },
@@ -172,7 +176,9 @@ export const City = {
         if (chameleon) {
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "block";
             el(Html.FIRST_NIGHT_CHAMELEON_BUTTON).onclick = () => {
-                City.showRole(el(Html.CHAMELEON_SELECT).value);
+                let crole = el(Html.CHAMELEON_SELECT).value;
+                City.showRole(crole);
+                chameleon.role = Players.players[crole].role;
                 City.firstNightDirector();
             };
             for (let i = 0; i < Common.playerNum; i++) {
@@ -199,13 +205,36 @@ export const City = {
                 }
             }
         } else {
+            City.firstNightForecaster();
+        }
+    },
+    firstNightForecaster : function() {
+        let forecaster = Players.players.find(p => p.role == CityPlayers.FORECASTER);
+        if (forecaster) {
+            let fv = 0;
+            el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+            el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
+            el(Html.FIRST_NIGHT_FORECASTER).style.display = "block";
+            el(Html.FORECASTER_INPUT).onchange = () => {
+                fv = Math.abs(parseInt(el(Html.FORECASTER_INPUT).value));
+                fv = fv < 1 ? 1 : fv > 20 ? 20 : fv;
+                el(Html.FORECASTER_INPUT).value = fv;
+            };
+            el(Html.FIRST_NIGHT_FORECASTER_BUTTON).onclick = () => {
+                City.forecast = fv;
+                console.log("Forecast set to: ", City.forecast);
+                City.firstNightKillersMeeting();
+            };
+            } 
+            else {
             City.firstNightKillersMeeting();
         }
     },
-    //TODO:firstnight forecaster
+    
     firstNightKillersMeeting : function() {
         el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
         el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+        el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
         el(Html.FIRST_NIGHT_KILLERS_MEETING).style.display = "block";
         el(Html.FIRST_NIGHT_KILLERS_MEETING_BUTTON).style.display = "none";
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
