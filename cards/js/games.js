@@ -20,6 +20,7 @@ export const Games = {
     // games
     JAGO : 0,
     LORUM : 1,
+    CITY : 2,
     // runnng game and phase
     running : 0, // actual running game index
     phase : 0, // actual phase of the game
@@ -179,6 +180,7 @@ Games.cgames = [
             [States.SHOW_PLAYERS, RuleAction.RUN, City.setRandomRoles],
 
             [States.SHOW_PLAYERS, RuleAction.DISABLE_BUTTON, Html.NEXT_BUTTON],
+            [States.SHOW_PLAYERS, RuleAction.RUN, City.testTestMode],
             [States.SHOW_PLAYERS, RuleAction.SHOW_ALL, Html.SHOW_PLAYER_CLASS],
             [States.SHOW_PLAYERS, RuleAction.MESSAGE, "Mutasd meg egyesével a játékosoknak a szerepüket!"],
 

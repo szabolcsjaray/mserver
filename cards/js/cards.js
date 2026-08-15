@@ -26,7 +26,7 @@ function init() {
   Common.addPlayerModal = document.getElementById('modal');
   Players.readLastPlayers();
 
-  Games.changeTo(Games.LORUM);
+  Games.changeTo(Games.CITY);
   Games.setPhase(States.PLAY);
 }
 

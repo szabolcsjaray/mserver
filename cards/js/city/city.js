@@ -1,15 +1,14 @@
-import { Common, el } from "../common.js";
+import { Common, el, getObj, getObjs } from "../common.js";
 import { CityPlayers } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
 import { Players } from '../player.js';
 
 export const City = {
+    testMode : true, //TODO: false if game is ready
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
     day: 0,
-    countdown: 0, //starts counting until 3 if Baker killed
-    forecast: 0,
     nextPhase : function() {
         Games.stepPhase();
     },
@@ -133,7 +132,6 @@ export const City = {
         City.setPlayerRoleIcons();
         //TEST HUNGLOVER: Players.players[0].lover = 1;
         console.log("Players: ", Players.players);
-        console.log("HOOOVERGUN: ", City.hoovergun);
     },
     showPlayer : function(evt) {
         let target = evt.target;
@@ -168,7 +166,16 @@ export const City = {
                 break;
             }
         }
-        el(Html.NEXT_BUTTON).disabled = !allShowed;
+        if (!City.testMode) {
+            el(Html.NEXT_BUTTON).disabled = !allShowed;
+        } else {
+            el(Html.NEXT_BUTTON).disabled = false;
+        }
+    },
+    testTestMode : function() {
+        if (City.testMode) {
+            el(Html.NEXT_BUTTON).disabled = false;
+        }
     },
     firstNightChameleon : function() {
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = true;
@@ -179,7 +186,13 @@ export const City = {
                 let crole = el(Html.CHAMELEON_SELECT).value;
                 City.showRole(crole);
                 chameleon.role = Players.players[crole].role;
-                City.firstNightDirector();
+                if (chameleon.role == CityPlayers.DIRECTOR) {
+                    City.firstNightDirector(true);
+                } else if (chameleon.role == CityPlayers.FORECASTER) {
+                    City.firstNightForecaster(true);
+                } else {
+                    City.firstNightKillersMeeting();
+                }
             };
             for (let i = 0; i < Common.playerNum; i++) {
                 if (Players.players[i].role != CityPlayers.CHAMELEON) {
@@ -190,43 +203,72 @@ export const City = {
             City.firstNightDirector();
         }
     },
-    firstNightDirector : function() {
-        let director = Players.players.find(p => p.role == CityPlayers.DIRECTOR);
-        if (director) {
+    firstNightDirector : function(cham=false) {
+        let directors = getObjs(Players.players, "role", CityPlayers.DIRECTOR);
+        if (directors.length > 0) {
+            let director = getObj(directors, "chameleon", cham);
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+             el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
             el(Html.FIRST_NIGHT_DIRECTOR).style.display = "block";
-            el(Html.FIRST_NIGHT_DIRECTOR_BUTTON).onclick = () => {
-                City.showRole(el(Html.DIRECTOR_SELECT).value);
-                City.firstNightKillersMeeting();
-            };
+            if (cham) {
+                el('igQ').innerHTML = "a Kaméleon";
+            } else {
+                el('igQ').innerHTML = "az";
+            }
+            
+            el(Html.DIRECTOR_SELECT).innerHTML = "";
             for (let i = 0; i < Common.playerNum; i++) {
-                if (Players.players[i].role != CityPlayers.DIRECTOR) {
+                if (cham) {
+                    if (Players.players[i].role != CityPlayers.DIRECTOR && Players.players[i].role != CityPlayers.CHAMELEON) {
+                        el(Html.DIRECTOR_SELECT).innerHTML += "<option value='" + i + "'>" + Players.players[i].name + "</option>";
+                    }
+                } else {
+                    if (Players.players[i].role != CityPlayers.DIRECTOR || Players.players[i].chameleon) {
                     el(Html.DIRECTOR_SELECT).innerHTML += "<option value='" + i + "'>" + Players.players[i].name + "</option>";
+                    }
                 }
             }
+
+            el(Html.FIRST_NIGHT_DIRECTOR_BUTTON).onclick = () => {
+                City.showRole(el(Html.DIRECTOR_SELECT).value);
+                if (cham) {
+                City.firstNightDirector();
+                } else {
+                City.firstNightForecaster();
+                }
+            };
         } else {
-            City.firstNightForecaster();
+                City.firstNightForecaster();
         }
     },
-    firstNightForecaster : function() {
-        let forecaster = Players.players.find(p => p.role == CityPlayers.FORECASTER);
-        if (forecaster) {
+    firstNightForecaster : function(cham=false) {
+        let forecasters = getObjs(Players.players, "role", CityPlayers.FORECASTER);
+        if (forecasters.length > 0) {
+            let forecaster = getObj(forecasters, "chameleon", cham);
             let fv = 0;
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
             el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
             el(Html.FIRST_NIGHT_FORECASTER).style.display = "block";
+            if (cham) {
+                el('fcQ').innerHTML = "a Kaméleon";
+            } else {
+                el('fcQ').innerHTML = "az";
+            }
             el(Html.FORECASTER_INPUT).onchange = () => {
                 fv = Math.abs(parseInt(el(Html.FORECASTER_INPUT).value));
                 fv = fv < 1 ? 1 : fv > 20 ? 20 : fv;
                 el(Html.FORECASTER_INPUT).value = fv;
             };
             el(Html.FIRST_NIGHT_FORECASTER_BUTTON).onclick = () => {
-                City.forecast = fv;
-                console.log("Forecast set to: ", City.forecast);
-                City.firstNightKillersMeeting();
+                forecaster.forecast = fv;
+                if (cham) {
+                    City.firstNightDirector();
+                } else {
+                    City.firstNightKillersMeeting();
+                }
+                
             };
-            } 
-            else {
+        } else {
             City.firstNightKillersMeeting();
         }
     },
@@ -238,6 +280,7 @@ export const City = {
         el(Html.FIRST_NIGHT_KILLERS_MEETING).style.display = "block";
         el(Html.FIRST_NIGHT_KILLERS_MEETING_BUTTON).style.display = "none";
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
+        el(Html.NEXT_BUTTON).disabled = false;
         el(Html.FIRST_NIGHT_NEXT_BUTTON).onclick = () => {
             el(Html.FIRST_NIGHT_OVERLAY).style.display = "none";
             Games.stepPhase();

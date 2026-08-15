@@ -26,6 +26,8 @@ Players.Player = class Player {
         this.gotHoover = false; //got hoover at night earlier
         this.getWater = false; //gets watergun shot at night
         this.usedResurrect = false; //priest used resurrect
+        this.forecast = 0; //forecasted end day
+        this.countdown = 0; //if Baker (chameleon) is killed, end day of game
     }
 };
 

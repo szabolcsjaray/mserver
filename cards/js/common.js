@@ -77,7 +77,7 @@ let delItemDeep = (arr, prop, it) => {
     }
 }
 
-let getObj = (arr, prop, it) => {
+export let getObj = (arr, prop, it) => {
     let r = arr.findIndex((a) => a[prop] === it);
     if (r > -1) {
         return arr[r];
@@ -86,7 +86,7 @@ let getObj = (arr, prop, it) => {
     }
 };
 
-let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] === it);
+export let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] === it);
 
 let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
 

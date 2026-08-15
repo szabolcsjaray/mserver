@@ -318,9 +318,10 @@
 
 #showRoleContent {
     width: 98%;
-    height: 95%;
+    min-height: 95%;
+    max-height: fit-content;
     max-width: 98%;
-    font-size: max(1.4vw, 1.1em);
+    font-size: max(1.3vw, 1.3vh, 1em);
     background-image: url(./../img/paperback.jpg);
 	  background-size: cover;
     border: darkslategray outset 5px;
@@ -334,18 +335,18 @@
 
 #showRoleName {
   color: cornflowerblue;
-  font-size: max(1.8vw, 1.6em);
+  font-size: max(1.75vw, 1.5em);
 }
 
 #showRoleRole {
   color: orange;
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
-  font-size: max(2vw, 1.7em);
+  font-size: max(1.9vw, 1.6em);
   margin-top: 10px;
 }
 
 #showRoleImg {
-  width: min(40vw, 30vh, 150px);
+  width: min(40vw, 35vh, 150px);
     border: 4px outset lightcyan;
     outline: none;
     background-color: paleturquoise;
