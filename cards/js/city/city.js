@@ -1,5 +1,5 @@
-import { Common, el, getObj, getObjs } from "../common.js";
-import { CityPlayers } from './cityplayer.js';
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep } from "../common.js";
+import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
 import { Players } from '../player.js';
@@ -127,10 +127,14 @@ export const City = {
                 default:
                     break;
             }
+            p.evil = p.role.evil;
+            p.gmnight = p.role.gmnight;
+            p.winalone = p.role.winalone;
         }
 
         City.setPlayerRoleIcons();
-        //TEST HUNGLOVER: Players.players[0].lover = 1;
+        //TODO: TEST Hunglover - remove later
+        //Players.players[0].lover = 1;
         console.log("Players: ", Players.players);
     },
     showPlayer : function(evt) {
@@ -147,6 +151,7 @@ export const City = {
     showRole : function(playerI) {
         let player = Players.players[playerI];
         player.roleShowed = true;
+        console.log("PR: ", player.role);
         let shr = player.role.nev.toUpperCase();
         if (player.chameleon && player.role != CityPlayers.CHAMELEON) {
             shr += "<br><span id='chameleon-text'>(kaméleon)</span>";
@@ -186,6 +191,9 @@ export const City = {
                 let crole = el(Html.CHAMELEON_SELECT).value;
                 City.showRole(crole);
                 chameleon.role = Players.players[crole].role;
+                chameleon.evil = chameleon.role.evil;
+                chameleon.gmnight = chameleon.role.gmnight;
+                chameleon.winalone = chameleon.role.winalone;
                 if (chameleon.role == CityPlayers.DIRECTOR) {
                     City.firstNightDirector(true);
                 } else if (chameleon.role == CityPlayers.FORECASTER) {
@@ -301,7 +309,7 @@ export const City = {
             el(Html.DAY_OVERLAY).style.display="block";
             el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
             el(Html.BOX + lover).style.backgroundColor = "rgb(107, 92, 92)";
-            el(Html.NAME + id).style.color = "rgb(0,0,0)";
+            el(Html.NAME + lover).style.color = "rgb(0,0,0)";
             el(Html.DAY_NEXT_BUTTON).onclick = () => {
                el(Html.DAY_OVERLAY).style.display = "none";
             }
@@ -310,6 +318,145 @@ export const City = {
         el(Html.NAME + id).style.color = "rgb(0,0,0)";
         //TODO check end of game (also forecast), show winner
         Games.stepPhase();
+    },
+    nightMurder : function() {
+        console.log("Night murder phase");
+        el(Html.NIGHT_OVERLAY).style.display = "block";
+        el(Html.NE_MESSAGE).innerHTML = `Kit öltek meg a gyilkosok az éjszaka folyamán?`;
+        el(Html.NE_SELECT).innerHTML = "";
+        el(Html.NE_SELECT).style.display = "block";
+        for (let i = 0; i < Common.playerNum; i++) {
+            let p = Players.players[i];
+            if (p.alive === true ) {
+                el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+            }
+        }
+        el(Html.NE_BUTTON).onclick = () => {
+            let sid = Number(el(Html.NE_SELECT).value);
+            let hulla = Players.players[sid];
+            hulla.killed = true;
+            console.log('hulla: ', hulla);
+            City.nightActions();
+        }
+    },
+    nightActions : function() {
+        let naList0 = getObjsC(Players.players, "gmnight", ">0");
+        let naList = [];
+        if (City.hoovergun < 2) {
+            delItemDeep(naList0, "gmnight", 1);
+        }
+        for (let i = 0; i < NightOrder.length; i++) {
+            let rid = NightOrder[i];
+            let p = getObj(naList0, "role", rid);
+            if (p) {
+                naList.push(p);
+            }
+        } 
+        let nalCount = 0;
+        
+        el(Html.NE_BUTTON).onclick = () => {
+            City.nightActionResult(naList[nalCount]);
+            nalCount++;
+            if (nalCount < naList.length) {
+                City.realAction(naList[nalCount]);
+            } else {
+                el(Html.NIGHT_OVERLAY).style.display = "none";
+                Games.stepPhase();
+            }
+        }
+
+        City.realAction(naList[nalCount]);
+    },
+    realAction : (actP, cham=false) => {
+        let ms = actP.role.nightSpeech;
+        el(Html.NE_SELECT).innerHTML = "";
+        el(Html.NE_SELECT2).innerHTML = "";
+        el(Html.NE_SELECT).style.display = "none";
+        el(Html.NE_SELECT2).style.display = "none";
+        if (actP.alive === false) {
+            ms =+ "<br>(csak mondd, mivel meghalt)";
+            el(Html.NE_MESSAGE).innerHTML = ms;
+            return;
+        }
+        el(Html.NE_MESSAGE).innerHTML = ms;
+        
+        switch (actP.role) {
+            case CityPlayers.WITCH:
+                el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT2).style.display = "block";
+                el(Html.NE_SELECT).innerHTML += "<option value='0'>Gyógyital</option><option value='1'>Méreg</option>";
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (p.alive) {
+                        el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+            
+            case CityPlayers.DOCTOR:
+                el(Html.NE_SELECT).style.display = "block";
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (p.alive) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+
+            case CityPlayers.POLICE:
+                el(Html.NE_SELECT).style.display = "block";
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (cham) {
+                        if (p.alive && !p.chameleon) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                        } 
+                    } else {
+                        if (p.alive && (p.role != CityPlayers.POLICE || p.chameleon)) {
+                            el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                        }
+                    }
+                }
+                break;
+
+            default:
+                break;
+
+        }
+    },
+    nightActionResult : function(player) {
+        switch (player.role) {
+            case CityPlayers.WITCH:
+                let wact = el(Html.NE_SELECT).value;
+                let wtarget = el(Html.NE_SELECT2).value;
+                let wtargetP = Players.players[wtarget];
+                if (wact == 0) {
+                    wtargetP.saved = true;
+                } else if (wact == 1) {
+                    wtargetP.killed = true;
+                }
+                console.log("Witch action: ", wact, " on ", wtargetP);
+                break;
+            
+            case CityPlayers.DOCTOR:
+                let dtarget = el(Html.NE_SELECT).value;
+                let dtargetP = Players.players[dtarget];
+                dtargetP.saved = true;
+                console.log("Doctor action on ", dtargetP);
+                break;
+
+            case CityPlayers.POLICE:
+                let ptarget = el(Html.NE_SELECT).value;
+                City.showRole(ptarget);
+                console.log("Police action on ", ptarget);
+                break;
+            
+            default:
+                break;
+        }
+    },
+    nightChameleon : function() {
+        let chamel = Players.players.find(p => p.chameleon);
     },
     morningCalculations : function() {
         City.day++;

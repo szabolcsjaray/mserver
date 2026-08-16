@@ -15,7 +15,9 @@ Players.Player = class Player {
         this.alive = true;
         this.role = undefined;
         this.roleShowed = false;
-        this.evil = false; //gyilkos vagy maffiavezér
+        this.evil = false; //gyilkos maffiavezér vagy féltestvér
+        this.gmnight = 0; //game master mentions during normal round of night: 0 - skip, 1 - only if both alive, 2 - even if dead
+        this.winalone = false; //if true, player can win alone (clown, hoover, forecaster)
         this.chameleon = false; 
         this.killed = false; //to be killed (by evils or witch) at night
         this.saved = false; //to be saved (by doctor, witch or neighbor) at night
@@ -28,6 +30,7 @@ Players.Player = class Player {
         this.usedResurrect = false; //priest used resurrect
         this.forecast = 0; //forecasted end day
         this.countdown = 0; //if Baker (chameleon) is killed, end day of game
+        this.firstCupido = false; //cupido selected first
     }
 };
 

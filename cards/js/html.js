@@ -58,6 +58,13 @@ export const Html = {
     DAY_OVERLAY : "dayOverlay",
     HUNG_LOVER_NAME : "hungLoverName",
     DAY_NEXT_BUTTON : "dayNextButton",
+    NIGHT_OVERLAY : "nightOverlay",
+    NIGHT_EVENT : "nightEvent",
+    NE_MESSAGE : "neMessage",
+    NE_SELECT : "neSelect",
+    NE_SELECT2 : "neSelect2",
+    NE_BUTTON : "neButton",
+    NIGHT_NEXT_BUTTON : "nightNextButton",
     BOX : "box",
     NAME: "name",
     DUMMY : ""

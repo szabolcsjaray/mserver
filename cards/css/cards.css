@@ -346,7 +346,7 @@
 }
 
 #showRoleImg {
-  width: min(40vw, 35vh, 150px);
+  width: min(40vw, 35vh, 160px);
     border: 4px outset lightcyan;
     outline: none;
     background-color: paleturquoise;
@@ -384,4 +384,15 @@ img.showPlayerImg {
 
 #chameleon-text {
     font-size: 0.7em;
+}
+
+#nightOverlay {
+    display: none;
+}
+
+#neSelect, #neSelect2 {
+    display: none;
+    margin: 10px auto;
+    padding: 5px;
+    font-size: 1.1em;
 }

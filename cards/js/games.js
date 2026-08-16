@@ -193,8 +193,11 @@ Games.cgames = [
             
             [States.NIGHT, RuleAction.MESSAGE, "Éjszaka van, mindenki aludjon!"],
             [States.NIGHT, RuleAction.HIDE_ALL, Html.HANG_PLAYER_BUTTON],
+            [States.NIGHT, RuleAction.SHOW, Html.NIGHT_OVERLAY],
+            [States.NIGHT, RuleAction.RUN, City.nightMurder],
 
             [States.MORNING, RuleAction.MESSAGE, "Reggel van, mindenki ébredjen fel!"],
+            [States.MORNING, RuleAction.HIDE, Html.NIGHT_OVERLAY],
             [States.MORNING, RuleAction.RUN, City.morningCalculations],
 
             [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS],

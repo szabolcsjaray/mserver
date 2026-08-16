@@ -68,7 +68,7 @@ let delItem = (arr, it) => {
     }
 }
 
-let delItemDeep = (arr, prop, it) => {
+export let delItemDeep = (arr, prop, it) => {
     for (let n = 0; n < arr.length; n++) {
         if (arr[n][prop] == it) {
             arr.splice(n, 1);
@@ -88,7 +88,7 @@ export let getObj = (arr, prop, it) => {
 
 export let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] === it);
 
-let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
+export let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
 
 let checkListItem = (arr, prop, it) => {
     let r = false;
