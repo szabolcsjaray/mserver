@@ -1,4 +1,4 @@
-import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItemDeep } from "../common.js";
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItemDeep, rnd } from "../common.js";
 import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
@@ -137,8 +137,6 @@ export const City = {
         }
 
         City.setPlayerRoleIcons();
-        //TODO: TEST Hunglover - remove later
-        //Players.players[0].lover = 1;
         console.log("Players: ", Players.players);
     },
     showPlayer : function(evt) {
@@ -202,8 +200,10 @@ export const City = {
                     City.firstNightDirector(true);
                 } else if (chameleon.role == CityPlayers.FORECASTER) {
                     City.firstNightForecaster(true);
+                } else if (chameleon.role == CityPlayers.HALFBRO) {
+                    City.firstNightHalfbro(true);
                 } else {
-                    City.firstNightKillersMeeting();
+                    City.firstNightDirector();
                 }
             };
             for (let i = 0; i < Common.playerNum; i++) {
@@ -276,19 +276,50 @@ export const City = {
                 if (cham) {
                     City.firstNightDirector();
                 } else {
-                    City.firstNightKillersMeeting();
+                    City.firstNightHalfbro();
                 }
                 
             };
         } else {
+            City.firstNightHalfbro();
+        }
+    },
+    firstNightHalfbro : function(cham=false) {
+        let halfbros = getObjs(Players.players, "role", CityPlayers.HALFBRO);
+        if (halfbros.length > 0) {
+            let halfbro = getObj(halfbros, "chameleon", cham);
+            el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
+            el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
+            el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
+            el(Html.FIRST_NIGHT_HALFBRO).style.display = "block";
+            el(Html.FIRST_NIGHT_KILLIST).innerHTML = "";
+            if (cham) {
+                hbQ.innerHTML = "Kaméleon ";
+            } else {
+                hbQ.innerHTML = "";
+            }
+            for (let i = 0; i < Common.playerNum; i++) {
+                let p = Players.players[i];
+                if (p.role == CityPlayers.KILLER || p.role == CityPlayers.MAFFIA) {
+                    el(Html.FIRST_NIGHT_KILLIST).innerHTML += `- ${p.name}<br>`;
+                }
+            }       
+            el(Html.FIRST_NIGHT_HALFBRO_BUTTON).onclick = () => {
+                if (cham) {
+                City.firstNightDirector();
+                } else {
+                    City.firstNightKillersMeeting();
+                }
+            }
+        } else {
             City.firstNightKillersMeeting();
         }
     },
-    
     firstNightKillersMeeting : function() {
         el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
         el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
         el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
+        el(Html.FIRST_NIGHT_HALFBRO).style.display = "none";
         el(Html.FIRST_NIGHT_KILLERS_MEETING).style.display = "block";
         el(Html.FIRST_NIGHT_KILLERS_MEETING_BUTTON).style.display = "none";
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
@@ -319,7 +350,7 @@ export const City = {
         }
         el(Html.BOX + id).classList.add("deadPlayer");
         
-        //TODO check end of game (also forecast), show winner
+        //TODO other deaths + check end of game (also forecast), show winner
         Games.stepPhase();
     },
     nightMurder : function() {
@@ -490,6 +521,27 @@ export const City = {
                 }
                 break;
             
+            case CityPlayers.HOOVER:
+                el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>"
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (p.alive && !p.gotHoover && p != actP) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+            
+            case CityPlayers.WATERGUN:
+                el(Html.NE_SELECT).style.display = "block";
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (p.alive && p != actP) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+            
             default:
                 break;
 
@@ -570,6 +622,19 @@ export const City = {
                 el(Html.NE_SELECT).disabled = false;
                 break;
             
+            case CityPlayers.HOOVER:
+                let htarget = el(Html.NE_SELECT).value;
+                if (htarget < 0) return;
+                let happyP = Players.players[htarget];
+                happyP.gotHoover = true;
+                break;
+            
+            case CityPlayers.WATERGUN:
+                let wtarget = el(Html.NE_SELECT).value;
+                let wetP = Players.players[wtarget];
+                wetP.getWater = true;
+                break;
+
             default:
                 break;
         }
@@ -579,6 +644,6 @@ export const City = {
     },
     morningCalculations : function() {
         City.day++;
-        //TODO: all calculations: killed, saved, resurrected, cupido
+        //TODO: all calculations: killed, saved, resurrected, cupido, porszívó
     }
 };

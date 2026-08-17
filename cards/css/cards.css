@@ -378,6 +378,10 @@ img.showPlayerImg {
     display: none;
 }
 
+#firstNightHalfbro {
+    display: none;
+}
+
 #dayOverlay {
     display: none;
 }
@@ -402,4 +406,9 @@ img.showPlayerImg {
 .deadPlayer {
   background-color: rgb(107, 92, 92) !important;
   color: black !important;
+}
+
+#killist {
+	padding: 8px;
+	margin-left: 10px auto;
 }

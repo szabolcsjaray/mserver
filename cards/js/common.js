@@ -35,7 +35,7 @@ export function isVisible(id) {
 
 //Gergő's basic functions - export if needed
 
-let rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
+export let rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 let shuffle = (arr) => {
     for (let i = arr.length - 1; i > 0; i--) {
