@@ -630,8 +630,8 @@ export const City = {
                 break;
             
             case CityPlayers.WATERGUN:
-                let wtarget = el(Html.NE_SELECT).value;
-                let wetP = Players.players[wtarget];
+                let watarget = el(Html.NE_SELECT).value;
+                let wetP = Players.players[watarget];
                 wetP.getWater = true;
                 break;
 
