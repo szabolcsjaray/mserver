@@ -1,4 +1,4 @@
-import { Common, el, getObj, getObjs, getObjsC, delItemDeep } from "../common.js";
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItemDeep } from "../common.js";
 import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
@@ -122,6 +122,10 @@ export const City = {
             
                 case CityPlayers.WATERGUN:
                     City.hoovergun++;
+                    break;
+                
+                case CityPlayers.WITCH:
+                    p.potions = Math.floor(Common.playerNum * Math.random() / 3);
                     break;
             
                 default:
@@ -308,14 +312,13 @@ export const City = {
             Players.players[lover].alive = false;
             el(Html.DAY_OVERLAY).style.display="block";
             el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
-            el(Html.BOX + lover).style.backgroundColor = "rgb(107, 92, 92)";
-            el(Html.NAME + lover).style.color = "rgb(0,0,0)";
+            el(Html.BOX + lover).classList.add("deadPlayer");
             el(Html.DAY_NEXT_BUTTON).onclick = () => {
                el(Html.DAY_OVERLAY).style.display = "none";
             }
         }
-        el(Html.BOX + id).style.backgroundColor = "rgb(107, 92, 92)";
-        el(Html.NAME + id).style.color = "rgb(0,0,0)";
+        el(Html.BOX + id).classList.add("deadPlayer");
+        
         //TODO check end of game (also forecast), show winner
         Games.stepPhase();
     },
@@ -323,8 +326,9 @@ export const City = {
         console.log("Night murder phase");
         el(Html.NIGHT_OVERLAY).style.display = "block";
         el(Html.NE_MESSAGE).innerHTML = `Kit öltek meg a gyilkosok az éjszaka folyamán?`;
-        el(Html.NE_SELECT).innerHTML = "";
+        el(Html.NE_SELECT).innerHTML = "<option value='-1'>Senkit</option>";
         el(Html.NE_SELECT).style.display = "block";
+        el(Html.NE_SELECT2).style.display = "none";
         for (let i = 0; i < Common.playerNum; i++) {
             let p = Players.players[i];
             if (p.alive === true ) {
@@ -333,10 +337,13 @@ export const City = {
         }
         el(Html.NE_BUTTON).onclick = () => {
             let sid = Number(el(Html.NE_SELECT).value);
-            let hulla = Players.players[sid];
-            hulla.killed = true;
-            console.log('hulla: ', hulla);
-            City.nightActions();
+            if (sid < 0) { City.nightActions();} 
+            else {
+                let hulla = Players.players[sid];
+                hulla.killed = true;
+                console.log('hulla: ', hulla);
+                City.nightActions();
+            }
         }
     },
     nightActions : function() {
@@ -344,6 +351,9 @@ export const City = {
         let naList = [];
         if (City.hoovergun < 2) {
             delItemDeep(naList0, "gmnight", 1);
+        }
+        if (!checkItemDeep(Players.players, "alive", false)) {
+            delItemDeep(naList0, "role", CityPlayers.PRIEST)
         }
         for (let i = 0; i < NightOrder.length; i++) {
             let rid = NightOrder[i];
@@ -354,8 +364,8 @@ export const City = {
         } 
         let nalCount = 0;
         
-        el(Html.NE_BUTTON).onclick = () => {
-            City.nightActionResult(naList[nalCount]);
+       el(Html.NE_BUTTON).onclick = () => {
+            if (naList[nalCount].alive) City.nightActionResult(naList[nalCount]);
             nalCount++;
             if (nalCount < naList.length) {
                 City.realAction(naList[nalCount]);
@@ -364,31 +374,46 @@ export const City = {
                 Games.stepPhase();
             }
         }
-
+        
         City.realAction(naList[nalCount]);
     },
-    realAction : (actP, cham=false) => {
+    realAction : (actP) => {
+        let cham = actP.chameleon;
         let ms = actP.role.nightSpeech;
         el(Html.NE_SELECT).innerHTML = "";
         el(Html.NE_SELECT2).innerHTML = "";
         el(Html.NE_SELECT).style.display = "none";
         el(Html.NE_SELECT2).style.display = "none";
-        if (actP.alive === false) {
-            ms =+ "<br>(csak mondd, mivel meghalt)";
+        if (!actP.alive) {
+            ms += "<br>(csak mondd, mivel meghalt)";
             el(Html.NE_MESSAGE).innerHTML = ms;
             return;
+        }
+        if (actP.role == CityPlayers.WITCH) {
+            ms += "<br>("+actP.potions+" főzet van nálad)";
         }
         el(Html.NE_MESSAGE).innerHTML = ms;
         
         switch (actP.role) {
             case CityPlayers.WITCH:
                 el(Html.NE_SELECT).style.display = "block";
-                el(Html.NE_SELECT2).style.display = "block";
-                el(Html.NE_SELECT).innerHTML += "<option value='0'>Gyógyital</option><option value='1'>Méreg</option>";
-                for (let i = 0; i < Common.playerNum; i++) {
-                    let p = Players.players[i];
-                    if (p.alive) {
-                        el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                el(Html.NE_SELECT).innerHTML += "<option value='0'>Főzés</option>";
+                if (actP.potions > 0) {
+                    el(Html.NE_SELECT).innerHTML += "<option value='1'>Gyógyítás</option><option value='2'>Mérgezés</option>";
+                    el(Html.NE_SELECT2).style.display = "block";
+                    el(Html.NE_SELECT2).style.visibility = "hidden";
+                    for (let i = 0; i < Common.playerNum; i++) {
+                        let p = Players.players[i];
+                        if (p.alive) {
+                            el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                        }
+                    }
+                }
+                el(Html.NE_SELECT).onchange = () => {
+                    if (el(Html.NE_SELECT).value > 0) {
+                        el(Html.NE_SELECT2).style.visibility = "visible";
+                    } else {
+                        el(Html.NE_SELECT2).style.visibility = "hidden";
                     }
                 }
                 break;
@@ -407,18 +432,64 @@ export const City = {
                 el(Html.NE_SELECT).style.display = "block";
                 for (let i = 0; i < Common.playerNum; i++) {
                     let p = Players.players[i];
-                    if (cham) {
-                        if (p.alive && !p.chameleon) {
+                    if (p.alive && p != actP) {
                         el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
-                        } 
-                    } else {
-                        if (p.alive && (p.role != CityPlayers.POLICE || p.chameleon)) {
-                            el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
-                        }
                     }
                 }
                 break;
 
+            case CityPlayers.PRIEST:
+                el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT2).style.display = "block";
+                el(Html.NE_SELECT).innerHTML += "<option value='0'>Kérdezés</option>";                
+                if (!actP.usedResurrect) {
+                    el(Html.NE_SELECT).innerHTML += "<option value='1'>Feltámasztás</option>";
+                }
+                
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (!p.alive) {
+                        el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+            
+            case CityPlayers.NEIGHBOUR:
+                el(Html.NE_SELECT).style.display = "block";
+                for (let i = 0; i < Common.playerNum; i++) {
+                    if (i == actP.preneigh) continue;
+                    let p = Players.players[i];
+                    if (p.alive && p != actP) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                break;
+            
+            case CityPlayers.CUPIDO:
+                el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT).innerHTML += "<option value = ''>Válassz jól!</option>"
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (p.alive) {
+                        el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                    }
+                }
+                
+                el(Html.NE_SELECT).onchange = () => {
+                    let cexcept = el(Html.NE_SELECT).value;
+                    el(Html.NE_SELECT).disabled = true;
+                    el(Html.NE_SELECT2).style.display = "block";
+                    
+                    for (let i = 0; i < Common.playerNum; i++) {
+                        if (i == cexcept) continue;
+                        let p = Players.players[i];
+                        if (p.alive) {
+                            el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                        }
+                    }
+                }
+                break;
+            
             default:
                 break;
 
@@ -431,9 +502,15 @@ export const City = {
                 let wtarget = el(Html.NE_SELECT2).value;
                 let wtargetP = Players.players[wtarget];
                 if (wact == 0) {
+                    player.potions++;
+                }
+                if (wact == 1) {
                     wtargetP.saved = true;
-                } else if (wact == 1) {
+                    player.potions--;
+                } 
+                if (wact == 2) {
                     wtargetP.killed = true;
+                    player.potions--;
                 }
                 console.log("Witch action: ", wact, " on ", wtargetP);
                 break;
@@ -451,6 +528,48 @@ export const City = {
                 console.log("Police action on ", ptarget);
                 break;
             
+            case CityPlayers.PRIEST:
+                let pract = el(Html.NE_SELECT).value;
+                let prtarget = el(Html.NE_SELECT2).value;
+                if (pract == 0) {
+                    City.showRole(prtarget);
+                } else {
+                    Players.players[prtarget].resurrected = true;
+                    player.usedResurrect = true;
+                }
+                console.log("Priest action: ", pract, " on ", prtarget);
+                break;
+            
+            case CityPlayers.NEIGHBOUR:
+                let ntarget = el(Html.NE_SELECT).value;
+                let neigh = Players.players[ntarget];
+                if (neigh.role == CityPlayers.KILLER || neigh.role == CityPlayers.MAFFIA) {
+                    player.killed = true;
+                } else {
+                    player.saved = true;
+                    neigh.saved = true;
+                }
+                player.preneigh = ntarget;
+                console.log("Neighbour action on ", ntarget);
+                break;
+            
+            case CityPlayers.CUPIDO:
+                let cup1 = el(Html.NE_SELECT).value;
+                let cup2 = el(Html.NE_SELECT2).value;
+                for (let i = 0; i < Common.playerNum; i++) {
+                    let p = Players.players[i];
+                    if (i == cup1) {
+                        p.lover = cup2;
+                    } else if (i == cup2) {
+                        p.lover = cup1;
+                    } else {
+                        p.lover = -1;
+                    }
+                }
+                console.log("Cupido action on " + cup1 + " & " + cup2);
+                el(Html.NE_SELECT).disabled = false;
+                break;
+            
             default:
                 break;
         }
@@ -460,6 +579,6 @@ export const City = {
     },
     morningCalculations : function() {
         City.day++;
-        //TODO: all calculations
+        //TODO: all calculations: killed, saved, resurrected, cupido
     }
 };

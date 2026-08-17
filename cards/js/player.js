@@ -27,10 +27,12 @@ Players.Player = class Player {
         this.getHoover = false; //gets hoover at night
         this.gotHoover = false; //got hoover at night earlier
         this.getWater = false; //gets watergun shot at night
+        this.resurrected = false; //will become alive the next morning
         this.usedResurrect = false; //priest used resurrect
         this.forecast = 0; //forecasted end day
         this.countdown = 0; //if Baker (chameleon) is killed, end day of game
         this.firstCupido = false; //cupido selected first
+        this.potions = 0; //witch's potions
     }
 };
 

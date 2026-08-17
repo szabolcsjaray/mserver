@@ -395,4 +395,11 @@ img.showPlayerImg {
     margin: 10px auto;
     padding: 5px;
     font-size: 1.1em;
+    font-size: 20px;
+    width:70%;
+}
+
+.deadPlayer {
+  background-color: rgb(107, 92, 92) !important;
+  color: black !important;
 }
