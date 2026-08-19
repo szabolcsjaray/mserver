@@ -412,3 +412,8 @@ img.showPlayerImg {
 	padding: 8px;
 	margin-left: 10px auto;
 }
+
+#nightNextButton {
+  display: none;
+  margin: 0 auto;
+}

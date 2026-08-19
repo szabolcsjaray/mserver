@@ -1,4 +1,4 @@
-import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItemDeep, rnd } from "../common.js";
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItem, checkItemDeep, checkListItem, rnd } from "../common.js";
 import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
@@ -153,7 +153,6 @@ export const City = {
     showRole : function(playerI) {
         let player = Players.players[playerI];
         player.roleShowed = true;
-        console.log("PR: ", player.role);
         let shr = player.role.nev.toUpperCase();
         if (player.chameleon && player.role != CityPlayers.CHAMELEON) {
             shr += "<br><span id='chameleon-text'>(kaméleon)</span>";
@@ -194,7 +193,6 @@ export const City = {
                 City.showRole(crole);
                 chameleon.role = Players.players[crole].role;
                 chameleon.evil = chameleon.role.evil;
-                chameleon.gmnight = chameleon.role.gmnight;
                 chameleon.winalone = chameleon.role.winalone;
                 if (chameleon.role == CityPlayers.DIRECTOR) {
                     City.firstNightDirector(true);
@@ -338,16 +336,26 @@ export const City = {
         if (id >= Common.playerNum) return;
         if (Players.players[id].alive === false) return;
         Players.players[id].alive = false;
-        let lover = Players.players[id].lover;
-        if (lover > -1) {
-            Players.players[lover].alive = false;
+        //TODO: ide ehelyett kell egy overall deathcheck
+        let lovers = Players.players[id].lover;
+        console.log("LOVERS: ", lovers, lovers.length);
+        if (lovers.length > 0){
             el(Html.DAY_OVERLAY).style.display="block";
-            el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
-            el(Html.BOX + lover).classList.add("deadPlayer");
+            for (let i = 0; i < lovers.length; i++) {
+                const lover = lovers[i];
+                Players.players[lover].alive = false;
+                if (i == 0) {
+                    el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
+                } else {
+                    el(Html.HUNG_LOVER_NAME).innerHTML += " és " + Players.players[lover].name;
+                }
+                el(Html.BOX + lover).classList.add("deadPlayer");
+            }
             el(Html.DAY_NEXT_BUTTON).onclick = () => {
                el(Html.DAY_OVERLAY).style.display = "none";
             }
         }
+        
         el(Html.BOX + id).classList.add("deadPlayer");
         
         //TODO other deaths + check end of game (also forecast), show winner
@@ -355,11 +363,17 @@ export const City = {
     },
     nightMurder : function() {
         console.log("Night murder phase");
+        Players.players.map((p) => p.lover = []);
         el(Html.NIGHT_OVERLAY).style.display = "block";
+        el(Html.NIGHT_EVENT).style.display = "block";
+        el(Html.NIGHT_NEXT_BUTTON).style.display = "none";
         el(Html.NE_MESSAGE).innerHTML = `Kit öltek meg a gyilkosok az éjszaka folyamán?`;
         el(Html.NE_SELECT).innerHTML = "<option value='-1'>Senkit</option>";
         el(Html.NE_SELECT).style.display = "block";
         el(Html.NE_SELECT2).style.display = "none";
+        el(Html.NE_SELECT).removeEventListener("change", City.witchSelectHandle);
+        el(Html.NE_SELECT).removeEventListener("change", City.cupidSelectHandle);
+        el(Html.NE_SELECT).disabled = false;
         for (let i = 0; i < Common.playerNum; i++) {
             let p = Players.players[i];
             if (p.alive === true ) {
@@ -401,16 +415,48 @@ export const City = {
             if (nalCount < naList.length) {
                 City.realAction(naList[nalCount]);
             } else {
-                el(Html.NIGHT_OVERLAY).style.display = "none";
-                Games.stepPhase();
+                let chame = checkItemDeep(Players.players, "chameleon", true);
+                if (chame) {
+                    City.nightChameleon()
+                } else {
+                    el(Html.NIGHT_EVENT).style.display = "none";
+                    el(Html.NIGHT_NEXT_BUTTON).style.display = "block";
+                    el(Html.NIGHT_NEXT_BUTTON).onclick = () => {
+                        el(Html.NIGHT_OVERLAY).style.display = "none";
+                        Games.stepPhase();
+                    }
+                }
             }
         }
         
+        
         City.realAction(naList[nalCount]);
     },
+    witchSelectHandle : () => {
+            if (el(Html.NE_SELECT).value > 0) {
+                el(Html.NE_SELECT2).style.visibility = "visible";
+            } else {
+                el(Html.NE_SELECT2).style.visibility = "hidden";
+            }
+        },
+    cupidSelectHandle: () => {
+            let cexcept = el(Html.NE_SELECT).value;
+            el(Html.NE_SELECT).disabled = true;
+            el(Html.NE_SELECT2).style.display = "block";
+            
+            for (let i = 0; i < Common.playerNum; i++) {
+                if (i == cexcept) continue;
+                let p = Players.players[i];
+                if (p.alive) {
+                    el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
+                }
+            }
+        },
     realAction : (actP) => {
         let cham = actP.chameleon;
-        let ms = actP.role.nightSpeech;
+        let ms = cham ? "A kaméleon tegye a dolgát!<br>" : "";
+        ms += actP.role.nightSpeech;
+        if (cham) ms += " (kaméleon)";
         el(Html.NE_SELECT).innerHTML = "";
         el(Html.NE_SELECT2).innerHTML = "";
         el(Html.NE_SELECT).style.display = "none";
@@ -440,13 +486,8 @@ export const City = {
                         }
                     }
                 }
-                el(Html.NE_SELECT).onchange = () => {
-                    if (el(Html.NE_SELECT).value > 0) {
-                        el(Html.NE_SELECT2).style.visibility = "visible";
-                    } else {
-                        el(Html.NE_SELECT2).style.visibility = "hidden";
-                    }
-                }
+                
+                el(Html.NE_SELECT).addEventListener("change", City.witchSelectHandle);
                 break;
             
             case CityPlayers.DOCTOR:
@@ -505,20 +546,7 @@ export const City = {
                         el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
                     }
                 }
-                
-                el(Html.NE_SELECT).onchange = () => {
-                    let cexcept = el(Html.NE_SELECT).value;
-                    el(Html.NE_SELECT).disabled = true;
-                    el(Html.NE_SELECT2).style.display = "block";
-                    
-                    for (let i = 0; i < Common.playerNum; i++) {
-                        if (i == cexcept) continue;
-                        let p = Players.players[i];
-                        if (p.alive) {
-                            el(Html.NE_SELECT2).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
-                        }
-                    }
-                }
+                el(Html.NE_SELECT).addEventListener("change", City.cupidSelectHandle);
                 break;
             
             case CityPlayers.HOOVER:
@@ -544,7 +572,6 @@ export const City = {
             
             default:
                 break;
-
         }
     },
     nightActionResult : function(player) {
@@ -564,7 +591,9 @@ export const City = {
                     wtargetP.killed = true;
                     player.potions--;
                 }
+                el(Html.NE_SELECT).removeEventListener("change", City.witchSelectHandle);
                 console.log("Witch action: ", wact, " on ", wtargetP);
+
                 break;
             
             case CityPlayers.DOCTOR:
@@ -608,18 +637,16 @@ export const City = {
             case CityPlayers.CUPIDO:
                 let cup1 = el(Html.NE_SELECT).value;
                 let cup2 = el(Html.NE_SELECT2).value;
-                for (let i = 0; i < Common.playerNum; i++) {
-                    let p = Players.players[i];
-                    if (i == cup1) {
-                        p.lover = cup2;
-                    } else if (i == cup2) {
-                        p.lover = cup1;
-                    } else {
-                        p.lover = -1;
-                    }
-                }
-                console.log("Cupido action on " + cup1 + " & " + cup2);
+                if (!checkItem(Players.players[cup1].lover, cup2)) Players.players[cup1].lover.push(cup2);
+                if (!checkItem(Players.players[cup2].lover, cup1)) Players.players[cup2].lover.push(cup1);
+                
+                Players.players.map((pp) => {
+                    console.log(pp.name + ": " + pp.lover);
+                });
+                
+                el(Html.NE_SELECT).removeEventListener("change", City.cupidSelectHandle);
                 el(Html.NE_SELECT).disabled = false;
+                console.log("Cupido action on " + cup1 + " & " + cup2);
                 break;
             
             case CityPlayers.HOOVER:
@@ -638,9 +665,28 @@ export const City = {
             default:
                 break;
         }
+        if (player.chameleon) {
+            el(Html.NIGHT_EVENT).style.display = "none";
+            el(Html.NIGHT_NEXT_BUTTON).style.display = "block";
+            el(Html.NIGHT_NEXT_BUTTON).onclick = () => {
+                el(Html.NIGHT_OVERLAY).style.display = "none";
+                Games.stepPhase();
+            }
+        }
     },
     nightChameleon : function() {
-        let chamel = Players.players.find(p => p.chameleon);
+        let chamel = getObj(Players.players, 'chameleon', true);
+        City.realAction(chamel);
+        el(Html.NE_BUTTON).onclick = () => {
+            City.nightActionResult(chamel);
+            el(Html.NIGHT_EVENT).style.display = "none";
+            el(Html.NIGHT_NEXT_BUTTON).style.display = "block";
+                el(Html.NIGHT_NEXT_BUTTON).onclick = () => {
+                    el(Html.NIGHT_OVERLAY).style.display = "none";
+                    Games.stepPhase();
+                }
+            }
+        console.log("Chameleon action.")
     },
     morningCalculations : function() {
         City.day++;

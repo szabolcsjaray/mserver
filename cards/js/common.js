@@ -90,7 +90,7 @@ export let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] == it);
 
 export let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
 
-let checkListItem = (arr, prop, it) => {
+export let checkListItem = (arr, prop, it) => {
     let r = false;
     for (const a of arr) {
         if (checkItem(a[prop], it)) r = true;
