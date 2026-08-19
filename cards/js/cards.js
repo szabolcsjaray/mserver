@@ -90,15 +90,13 @@ function playerRemove(evt) {
   if (confirm("A játékos " + el("name"+id).innerText + " biztosan kiszáll?")) {
     points.splice(id, 1);
     points.push(0);
-    for(let i = id; i < Common.playerNum+1; i++) {
+    for(let i = id; i < Common.playerNum - 1; i++) {
       let nextI = i+1;
-      if (nextI >= Common.playerNum) {
-        el("name" + i).innerHTML = "---";
-      } else {
-        el("name" + i).innerHTML = el("name" + nextI).innerHTML;
-      }
+      el("name" + i).innerHTML = el("name" + nextI).innerHTML;
       addPoint(i, 0);
     }
+    el("name" +(Common.playerNum-1)).innerHTML = "---";
+    addPoint(Common.playerNum - 1, 0);
     Common.playerNum--;
     colorPlayerBlocks();
   }

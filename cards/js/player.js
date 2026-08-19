@@ -52,11 +52,26 @@ Players.findPlayer = function (playerName) {
 };
 
 Players.readStoredPlayers = function () {
-    let item = localStorage.getItem(PLAYERS_STORAGE_KEY);
-    if (item == undefined || item == null) {
-        item = "[]";
+    let playrNamesArrayString = localStorage.getItem(PLAYERS_STORAGE_KEY);
+    if (playrNamesArrayString == undefined || playrNamesArrayString == null) {
+        Players.players = [];
+        return;
     }
-    Players.players = JSON.parse(item);
+    let playerNamesArray;
+    try {
+        playerNamesArray = JSON.parse(playrNamesArrayString);
+    } catch (e) {
+        Players.players = [];
+        return;
+    }
+    if (typeof playerNamesArray != "array" || playerNamesArray.length == 0
+        || typeof playerNamesArray[0] != "string") {
+        playerNamesArray = [];
+        Players.players = [];
+    }
+    playerNamesArray.forEach(name => {
+        Players.players.push(new Players.Player(name));
+    });
 };
 
 Players.readLastPlayers = function() {
@@ -73,7 +88,7 @@ Players.readLastPlayers = function() {
 };
 
 Players.saveStoredPlayers = function () {
-    localStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(Players.players));
+    localStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(Players.players.map(p => p.name)));
 };
 
 Players.writeLastPlayersToStore = function () {
