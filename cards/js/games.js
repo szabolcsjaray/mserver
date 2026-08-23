@@ -198,6 +198,7 @@ Games.cgames = [
 
             [States.MORNING, RuleAction.MESSAGE, "Reggel van, mindenki ébredjen fel!"],
             [States.MORNING, RuleAction.HIDE, Html.NIGHT_OVERLAY],
+            [States.MORNING, RuleAction.SHOW, Html.MORNING_OVERLAY],
             [States.MORNING, RuleAction.RUN, City.morningCalculations],
 
             [States.CLOSING, RuleAction.HIDE_CLASS, Html.ROLE_ICON_CLASS],

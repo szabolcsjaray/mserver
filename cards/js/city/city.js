@@ -1,4 +1,4 @@
-import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItem, checkItemDeep, checkListItem, rnd } from "../common.js";
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItem, checkItemDeep, smartList, rnd } from "../common.js";
 import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
@@ -327,6 +327,17 @@ export const City = {
             Games.stepPhase();
         }
     },
+    findLovers : function(id) {
+        let allLovers = Players.players[id].lover;
+        if (allLovers.length> 0) {
+            for (const al of allLovers) {
+                for (const al2 of Players.players[al].lover) {
+                    if (!checkItem(allLovers, al2) && Players.players[al2].alive && al2 != id) allLovers.push(al2);
+                }
+            }
+        }
+        return allLovers;
+    },
     hangPlayer : function(evt) {
         let target = evt.target;
         if (target.tagName == "IMG") {
@@ -336,21 +347,17 @@ export const City = {
         if (id >= Common.playerNum) return;
         if (Players.players[id].alive === false) return;
         Players.players[id].alive = false;
-        //TODO: ide ehelyett kell egy overall deathcheck
-        let lovers = Players.players[id].lover;
-        console.log("LOVERS: ", lovers, lovers.length);
+        let lovers = City.findLovers(id);
         if (lovers.length > 0){
             el(Html.DAY_OVERLAY).style.display="block";
+            let sl = [];
             for (let i = 0; i < lovers.length; i++) {
                 const lover = lovers[i];
                 Players.players[lover].alive = false;
-                if (i == 0) {
-                    el(Html.HUNG_LOVER_NAME).innerHTML = Players.players[lover].name;
-                } else {
-                    el(Html.HUNG_LOVER_NAME).innerHTML += " és " + Players.players[lover].name;
-                }
+                sl.push(Players.players[lover].name);
                 el(Html.BOX + lover).classList.add("deadPlayer");
             }
+            el(Html.HUNG_LOVER_NAME).innerHTML = smartList(sl);
             el(Html.DAY_NEXT_BUTTON).onclick = () => {
                el(Html.DAY_OVERLAY).style.display = "none";
             }
@@ -363,7 +370,14 @@ export const City = {
     },
     nightMurder : function() {
         console.log("Night murder phase");
-        Players.players.map((p) => p.lover = []);
+        Players.players.map((p) => {
+            p.lover = [];
+            p.killed = false;
+            p.saved = false;
+            p.getHoover = false; 
+            p.resurrected = false;
+            p.endGame = -1;
+        });
         el(Html.NIGHT_OVERLAY).style.display = "block";
         el(Html.NIGHT_EVENT).style.display = "block";
         el(Html.NIGHT_NEXT_BUTTON).style.display = "none";
@@ -639,11 +653,6 @@ export const City = {
                 let cup2 = el(Html.NE_SELECT2).value;
                 if (!checkItem(Players.players[cup1].lover, cup2)) Players.players[cup1].lover.push(cup2);
                 if (!checkItem(Players.players[cup2].lover, cup1)) Players.players[cup2].lover.push(cup1);
-                
-                Players.players.map((pp) => {
-                    console.log(pp.name + ": " + pp.lover);
-                });
-                
                 el(Html.NE_SELECT).removeEventListener("change", City.cupidSelectHandle);
                 el(Html.NE_SELECT).disabled = false;
                 console.log("Cupido action on " + cup1 + " & " + cup2);
@@ -653,13 +662,13 @@ export const City = {
                 let htarget = el(Html.NE_SELECT).value;
                 if (htarget < 0) return;
                 let happyP = Players.players[htarget];
-                happyP.gotHoover = true;
+                happyP.getHoover = true;
                 break;
             
             case CityPlayers.WATERGUN:
                 let watarget = el(Html.NE_SELECT).value;
                 let wetP = Players.players[watarget];
-                wetP.getWater = true;
+                if (wetP.getHoover) wetP.killed = true;
                 break;
 
             default:
@@ -690,6 +699,56 @@ export const City = {
     },
     morningCalculations : function() {
         City.day++;
-        //TODO: all calculations: killed, saved, resurrected, cupido, porszívó
+        let morningMS = `<p>${City.day}. nap</p>`;
+        let deathroll = [];
+        let hooverroll = [];
+        for (let i = 0; i < Common.playerNum; i++) {
+            let p = Players.players[i];
+            if (p.resurrected) {
+                p.lover = [];
+                p.killed = false;
+                p.saved = false;
+                p.getHoover = false; 
+                p.resurrected = false;
+                p.endGame = -1;
+                morningMS += `<p><span class="resurname">${p.name}</span> visszatért a halálból!</p>`;
+            } else if (p.killed && !p.saved) {
+                deathroll.push(i);
+            }
+            if (p.getHoover) {
+                hooverroll.push(i);
+                p.gotHoover = true;
+            }
+        };
+        if (deathroll.length > 0) {
+            for (const hulla of deathroll) {
+                let hullovers = City.findLovers(hulla);
+                for (const hl of hullovers) {
+                    if (!checkItem(deathroll, hl) && Players.players[hl].alive) deathroll.push(hl);
+                }
+            }
+            let hullak = [];
+            for (const dead of deathroll) {
+                Players.players[dead].alive = false;
+                el(Html.BOX + dead).classList.add("deadPlayer");
+                if (!checkItem(hullak, Players.players[dead].name)) hullak.push(Players.players[dead].name);
+            }
+            morningMS += `<p><span class="deadname">${smartList(hullak)}</span> meghalt az éjjel!</p>`;
+        } else {
+            morningMS += "<p>Senki sem halt meg!</p>";
+        }
+        if (hooverroll.length > 0) {
+            let hoovers = ["hiper-szuper", "csillivilli", "hápogó", "falra is mászó", "népdalokat éneklő", "idegtépően berregő", "hőre lágyuló", "jóravaló, takaros", "kellemetlen szagot árasztó", "nyugtalanítóan villogó", "szemtelen, mihaszna", "pöpecen önjáró", "peckesen lépkedő", "gúnyosan röfögő", "újszerűen kinéző", "alig használt", "fiatal, ambíciózus", "kissé bohó, de szerethető", "káros szenvedélyektől mentes", "kicsit sárga és savanyú", "szomorkásan zúgó", "minden kanyarban harsányan hahotázó", "öt percenként baljósan leálló", "szívszaggatóan köhécselő", "fanyar humorral megáldott", "komor füstöt árasztó"];
+            for (const h of hooverroll) {
+                let adj = rnd(hoovers);
+                morningMS += `<p><span class="hoovername">${Players.players[h].name}</span> kapott egy ${adj} porszívót.</p>`;
+            }
+        }
+        el(Html.MORNING_MESSAGE).innerHTML = morningMS;
+        //TODO: check hoovergun and any gameends
+        el(Html.MORNING_NEXT_BUTTON).onclick = () => {
+                el(Html.MORNING_OVERLAY).style.display = "none";
+                Games.stepPhase();
+            }
     }
 };

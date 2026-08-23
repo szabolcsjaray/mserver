@@ -16,7 +16,6 @@ export const CityPlayers = {
     WATERGUN : { id: 14, img: "water-gun-svgrepo-com.svg", nev: "Vízipisztolyos", desc: "Minden éjjel valakit lelősz a vízipisztolyoddal. Ha ő kapott porszívót, meghal.", basic: false, evil: false, gmnight: 1, winalone: false, nightSpeech: 'Kit lő le a vízipisztolyos?'},
     HALFBRO : { id: 15, img: "two-shadows-svgrepo-com.svg", nev: "Féltestvér", desc: "Látszólag polgár vagy, de a célod, hogy a gyilkosok nyerjenek.", basic: false, evil: true, gmnight: 0, winalone: false, nightSpeech: ''},
     FORECASTER : { id: 16, img: "fortune-teller-svgrepo-com.svg", nev: "Időjós", desc: "Jósold meg előre, hanyadik körben ér véget a játék! Ha akkor élsz és bejön, nyersz.", basic: false, evil: false, gmnight: 0, winalone: true, nightSpeech: ''},
-    AVENGER : { id: 17, img: "counter-strike-svgrepo-com.svg", nev: "Bosszúálló", desc: "Ha meghalsz, valakit magaddal viszel a halálba.", basic: false, evil: false, gmnight: 0, winalone: false, nightSpeech: ''},
     CITIZEN : { id: 50, img: "house-svgrepo-com.svg", nev: "Polgár", desc: "Különleges képesség nélküli polgár vagy.", basic: false, evil: false, gmnight: 0, winalone: false, nightSpeech: ''},
     UNKNOWN : { id: 100, img: "severity-unknown-svgrepo-com.svg", nev: "", desc: "", basic: false, evil: false, gmnight: 0, winalone: false, nightSpeech: ''}
 }
@@ -25,7 +24,7 @@ export const CityPlayers = {
 CityPlayers.ROLES = [ CityPlayers.KILLER, CityPlayers.MAFFIA, CityPlayers.POLICE,
              CityPlayers.DOCTOR, CityPlayers.CUPIDO, CityPlayers.DIRECTOR,
              CityPlayers.NEIGHBOUR, CityPlayers.CHAMELEON, CityPlayers.CLOWN,
-             CityPlayers.PRIEST, CityPlayers.WITCH, CityPlayers.BAKER, CityPlayers.HOOVER, CityPlayers.WATERGUN, CityPlayers.HALFBRO, CityPlayers.FORECASTER, CityPlayers.AVENGER
+             CityPlayers.PRIEST, CityPlayers.WITCH, CityPlayers.BAKER, CityPlayers.HOOVER, CityPlayers.WATERGUN, CityPlayers.HALFBRO, CityPlayers.FORECASTER
 ];
 
 export const NightOrder = [

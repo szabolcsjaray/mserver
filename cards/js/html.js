@@ -68,6 +68,9 @@ export const Html = {
     NE_SELECT2 : "neSelect2",
     NE_BUTTON : "neButton",
     NIGHT_NEXT_BUTTON : "nightNextButton",
+    MORNING_OVERLAY : "morningOverlay",
+    MORNING_MESSAGE : "morningMessage",
+    MORNING_NEXT_BUTTON : "morningNextButton",
     BOX : "box",
     NAME: "name",
     DUMMY : ""

@@ -86,11 +86,26 @@ export let getObj = (arr, prop, it) => {
     }
 };
 
+export let smartList = (arr) => {
+    let s = "";
+    for (let i = 0; i < arr.length; i++) {
+        let li = arr[i];
+        if (i == 0) {
+            s += li;
+        } else if (i == arr.length-1) {
+            s += " és " + li;
+        } else {
+            s += ", " + li;
+        }
+    }
+    return s;
+}
+
 export let getObjs = (arr, prop, it) => arr.filter((a) => a[prop] == it);
 
 export let getObjsC = (arr, prop, cond) => arr.filter((a) => eval(a[prop] + cond));
 
-export let checkListItem = (arr, prop, it) => {
+let checkListItem = (arr, prop, it) => {
     let r = false;
     for (const a of arr) {
         if (checkItem(a[prop], it)) r = true;
