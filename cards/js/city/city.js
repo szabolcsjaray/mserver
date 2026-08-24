@@ -1,14 +1,16 @@
-import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItem, checkItemDeep, smartList, rnd } from "../common.js";
+import { Common, el, getObj, getObjs, getObjsC, delItemDeep, checkItem, checkItemDeep, delItem,smartList, rnd } from "../common.js";
 import { CityPlayers, NightOrder } from './cityplayer.js';
 import { Html } from '../html.js';
 import { Games } from '../games.js';
 import { Players } from '../player.js';
+import { States } from "../states.js";
 
 export const City = {
     testMode : true, //TODO: false if game is ready
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
     day: 0,
+    hungerEnd : -1, //when no more bakers
     nextPhase : function() {
         Games.stepPhase();
     },
@@ -345,10 +347,13 @@ export const City = {
         }
         let id = target.id[Html.HANG_PLAYER_BUTTON.length + 1];
         if (id >= Common.playerNum) return;
-        if (Players.players[id].alive === false) return;
-        Players.players[id].alive = false;
+        let checkDead = [id];
+        let hungman = Players.players[id];
+        if (hungman.alive === false) return;
+        hungman.alive = false;
         let lovers = City.findLovers(id);
         if (lovers.length > 0){
+            checkDead = checkDead.concat(lovers);
             el(Html.DAY_OVERLAY).style.display="block";
             let sl = [];
             for (let i = 0; i < lovers.length; i++) {
@@ -357,16 +362,18 @@ export const City = {
                 sl.push(Players.players[lover].name);
                 el(Html.BOX + lover).classList.add("deadPlayer");
             }
-            el(Html.HUNG_LOVER_NAME).innerHTML = smartList(sl);
+            el(Html.HUNG_LOVER_NAME).innerHTML = smartList(sl) + " is meghalt szerelmi bánatában!";
             el(Html.DAY_NEXT_BUTTON).onclick = () => {
                el(Html.DAY_OVERLAY).style.display = "none";
             }
         }
-        
         el(Html.BOX + id).classList.add("deadPlayer");
-        
-        //TODO other deaths + check end of game (also forecast), show winner
-        Games.stepPhase();
+        if (hungman.role == CityPlayers.CLOWN) {
+            City.checkCityEnd([id]);
+        }
+        City.checkDeathFollowup(checkDead);
+        let end = City.checkCityEnd();
+        if (!end) Games.stepPhase();
     },
     nightMurder : function() {
         console.log("Night murder phase");
@@ -376,8 +383,8 @@ export const City = {
             p.saved = false;
             p.getHoover = false; 
             p.resurrected = false;
-            p.endGame = -1;
         });
+        el(Html.GAME_END_MORNING).innerHTML = "";
         el(Html.NIGHT_OVERLAY).style.display = "block";
         el(Html.NIGHT_EVENT).style.display = "block";
         el(Html.NIGHT_NEXT_BUTTON).style.display = "none";
@@ -395,6 +402,8 @@ export const City = {
             }
         }
         el(Html.NE_BUTTON).onclick = () => {
+            el(Html.GAME_END_DAY).innerHTML = "";
+            el(Html.GAME_END_MORNING).innerHTML = "";
             let sid = Number(el(Html.NE_SELECT).value);
             if (sid < 0) { City.nightActions();} 
             else {
@@ -468,7 +477,7 @@ export const City = {
         },
     realAction : (actP) => {
         let cham = actP.chameleon;
-        let ms = cham ? "A kaméleon tegye a dolgát!<br>" : "";
+        let ms = cham ? "A kaméleon csendben tegye a dolgát!<br>" : "";
         ms += actP.role.nightSpeech;
         if (cham) ms += " (kaméleon)";
         el(Html.NE_SELECT).innerHTML = "";
@@ -516,6 +525,7 @@ export const City = {
 
             case CityPlayers.POLICE:
                 el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>";
                 for (let i = 0; i < Common.playerNum; i++) {
                     let p = Players.players[i];
                     if (p.alive && p != actP) {
@@ -531,7 +541,7 @@ export const City = {
                 if (!actP.usedResurrect) {
                     el(Html.NE_SELECT).innerHTML += "<option value='1'>Feltámasztás</option>";
                 }
-                
+                el(Html.NE_SELECT2).innerHTML += "<option value = '-1'>Senkit</option>";
                 for (let i = 0; i < Common.playerNum; i++) {
                     let p = Players.players[i];
                     if (!p.alive) {
@@ -564,17 +574,21 @@ export const City = {
                 break;
             
             case CityPlayers.HOOVER:
+                if (City.hoovergun < 2) return;
                 el(Html.NE_SELECT).style.display = "block";
-                el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>"
+                el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>";
+                console.log(actP.gaveHoover);
                 for (let i = 0; i < Common.playerNum; i++) {
+                    console.log(i + ": " + checkItem(actP.gaveHoover, i));
                     let p = Players.players[i];
-                    if (p.alive && !p.gotHoover && p != actP) {
+                    if (p.alive && !checkItem(actP.gaveHoover, i) && p != actP) {
                         el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
                     }
                 }
                 break;
             
             case CityPlayers.WATERGUN:
+                if (City.hoovergun < 2) return;
                 el(Html.NE_SELECT).style.display = "block";
                 for (let i = 0; i < Common.playerNum; i++) {
                     let p = Players.players[i];
@@ -619,6 +633,7 @@ export const City = {
 
             case CityPlayers.POLICE:
                 let ptarget = el(Html.NE_SELECT).value;
+                if (ptarget < 0) return;
                 City.showRole(ptarget);
                 console.log("Police action on ", ptarget);
                 break;
@@ -627,8 +642,10 @@ export const City = {
                 let pract = el(Html.NE_SELECT).value;
                 let prtarget = el(Html.NE_SELECT2).value;
                 if (pract == 0) {
+                    if (prtarget < 0) return;
                     City.showRole(prtarget);
                 } else {
+                    if (prtarget < 0) return;
                     Players.players[prtarget].resurrected = true;
                     player.usedResurrect = true;
                 }
@@ -660,15 +677,19 @@ export const City = {
             
             case CityPlayers.HOOVER:
                 let htarget = el(Html.NE_SELECT).value;
-                if (htarget < 0) return;
+                if (htarget < 0 || City.hoovergun < 2) return;
                 let happyP = Players.players[htarget];
                 happyP.getHoover = true;
+                player.gaveHoover.push(htarget);
+                console.log("Hoover action on " + htarget, player.gaveHoover);
                 break;
             
             case CityPlayers.WATERGUN:
+                if (City.hoovergun < 2) return;
                 let watarget = el(Html.NE_SELECT).value;
                 let wetP = Players.players[watarget];
                 if (wetP.getHoover) wetP.killed = true;
+                console.log("Watergun action on " + watarget);
                 break;
 
             default:
@@ -687,7 +708,7 @@ export const City = {
         let chamel = getObj(Players.players, 'chameleon', true);
         City.realAction(chamel);
         el(Html.NE_BUTTON).onclick = () => {
-            City.nightActionResult(chamel);
+            if (chamel.alive) City.nightActionResult(chamel);
             el(Html.NIGHT_EVENT).style.display = "none";
             el(Html.NIGHT_NEXT_BUTTON).style.display = "block";
                 el(Html.NIGHT_NEXT_BUTTON).onclick = () => {
@@ -700,6 +721,7 @@ export const City = {
     morningCalculations : function() {
         City.day++;
         let morningMS = `<p>${City.day}. nap</p>`;
+        let noHungerTxt = true;
         let deathroll = [];
         let hooverroll = [];
         for (let i = 0; i < Common.playerNum; i++) {
@@ -710,10 +732,17 @@ export const City = {
                 p.saved = false;
                 p.getHoover = false; 
                 p.resurrected = false;
-                p.endGame = -1;
+                p.alive = true;
+                el(Html.BOX + i).classList.remove("deadPlayer");
                 morningMS += `<p><span class="resurname">${p.name}</span> visszatért a halálból!</p>`;
+                if (p.role == CityPlayers.BAKER) City.hungerEnd = -1;
             } else if (p.killed && !p.saved) {
                 deathroll.push(i);
+            }
+            if (City.hungerEnd > -1 && noHungerTxt) {
+                let countdown = City.hungerEnd - City.day;
+                if (countdown > 0) morningMS += `<p>${countdown} NAP MÚLVA VÉGETÉR A JÁTÉK!</p>`;
+                noHungerTxt = false;
             }
             if (p.getHoover) {
                 hooverroll.push(i);
@@ -735,7 +764,7 @@ export const City = {
             }
             morningMS += `<p><span class="deadname">${smartList(hullak)}</span> meghalt az éjjel!</p>`;
         } else {
-            morningMS += "<p>Senki sem halt meg!</p>";
+            if (City.day != City.hungerEnd) morningMS += "<p>Senki sem halt meg!</p>";
         }
         if (hooverroll.length > 0) {
             let hoovers = ["hiper-szuper", "csillivilli", "hápogó", "falra is mászó", "népdalokat éneklő", "idegtépően berregő", "hőre lágyuló", "jóravaló, takaros", "kellemetlen szagot árasztó", "nyugtalanítóan villogó", "szemtelen, mihaszna", "pöpecen önjáró", "peckesen lépkedő", "gúnyosan röfögő", "újszerűen kinéző", "alig használt", "fiatal, ambíciózus", "kissé bohó, de szerethető", "káros szenvedélyektől mentes", "kicsit sárga és savanyú", "szomorkásan zúgó", "minden kanyarban harsányan hahotázó", "öt percenként baljósan leálló", "szívszaggatóan köhécselő", "fanyar humorral megáldott", "komor füstöt árasztó"];
@@ -745,10 +774,187 @@ export const City = {
             }
         }
         el(Html.MORNING_MESSAGE).innerHTML = morningMS;
-        //TODO: check hoovergun and any gameends
+        console.log('deathroll: ', deathroll);
+        City.checkDeathFollowup(deathroll);
+        let end = City.checkCityEnd();
         el(Html.MORNING_NEXT_BUTTON).onclick = () => {
                 el(Html.MORNING_OVERLAY).style.display = "none";
                 Games.stepPhase();
             }
+    },
+    checkDeathFollowup : function(deathList) {
+        console.log('deathList: ', deathList);
+        let followMS = "";
+        for (const dl of deathList) {
+            let p = Players.players[dl];
+            switch (p.role) {
+                case CityPlayers.BAKER:
+                    let otherBaker = false;
+                    for (let i = 0; i < Common.playerNum; i++) {
+                        let p = Players.players[i];
+                        if (p.alive && p.role == CityPlayers.BAKER) {
+                            otherBaker = true;
+                        };
+                    }
+                    if (!otherBaker) {
+                        City.hungerEnd = City.day + 3;
+                        followMS = "3 NAP MÚLVA MINDENKI ÉHEN HAL!"
+                    }
+                    break;
+                
+                case CityPlayers.HOOVER:
+                    let otherHoover = false;
+                    for (let i = 0; i < Common.playerNum; i++) {
+                        let p = Players.players[i];
+                        if (p.alive && p.role == CityPlayers.HOOVER) otherHoover = true;
+                    }
+                    if (otherHoover == false) {
+                        City.hoovergun--;
+                        for (let j = 0; j < Common.playerNum; j++) {
+                            let p = Players.players[j];
+                            if (p.alive && p.role == CityPlayers.WATERGUN) {
+                                followMS = "A Vízipisztolyos gyerek felnőtt."
+                            };
+                        }
+                    }
+                    break;
+                
+                case CityPlayers.WATERGUN:
+                    let otherWater = false;
+                    for (let i = 0; i < Common.playerNum; i++) {
+                        let p = Players.players[i];
+                        if (p.alive && p.role == CityPlayers.WATERGUN) otherWater = true;
+                    }
+                    if (otherWater == false) {
+                        City.hoovergun--;
+                        for (let j = 0; j < Common.playerNum; j++) {
+                            let p = Players.players[j];
+                            if (p.alive && p.role == CityPlayers.HOOVER) {
+                                followMS = "A Porszívóügynök más hivatást választott."
+                            };
+                        }
+                    }
+                    break;
+                
+                default:
+                    break;
+            }
+        }
+        if (followMS.length > 0) {
+            City.displayImportantMessage(followMS);
+        }
+    },
+    displayImportantMessage : function(ms) {
+        console.log("MESSAGE: ", ms, Games.phase)
+        if (Games.phase == States.MORNING) {
+            el(Html.GAME_END_MORNING).innerHTML = ms;
+        } else {
+            el(Html.DAY_OVERLAY).style.display="block";
+            el(Html.GAME_END_DAY).innerHTML = ms;
+            el(Html.DAY_NEXT_BUTTON).onclick = () => {
+                el(Html.DAY_OVERLAY).style.display = "none";
+            }    
+        }
+    },
+    checkCityEnd : function (winners=[]) {
+        console.log('winners: ', winners);
+        let end = winners.length > 0;
+        let winMS = "<p>VÉGET ÉRT A JÁTÉK!</p>";
+        //hungerend
+        if (City.day == City.hungerEnd) {
+            for (let i = 0; i < Common.playerNum; i++) {
+                Players.players[i].alive = false;
+                el(Html.BOX + i).classList.add("deadPlayer");
+            }
+        };
+        let living = getObjs(Players.players, "alive", true);
+        //overkill
+        if (living.length < 1) {
+            end = true;
+            winMS += "<p>Mindenki veszített!</p>";
+            City.displayImportantMessage(winMS);
+            return end;
+        }
+        //Clown
+        if (winners.length > 0) {
+            let winame = Players.players[winners[0]].name + " (Bohóc";
+            if (Players.players[winners[0]].chameleon) winame += " - kaméleon";
+            winMS += `<p id="winnersList">Győzött ${winame})!</p>`;
+            City.displayImportantMessage(winMS);
+            return end;
+        }
+        let levils = getObjs(living, "evil", true);
+        let lgoods = getObjs(living, "evil", false);
+        //evil win
+        if (levils.length >= lgoods.length) {
+            end = true;
+            for (let i = 0; i < Common.playerNum; i++) {
+                let p = Players.players[i];
+                if (p.evil && p.alive && !p.winalone) {
+                    let wn = p.name + " (" + p.role.nev;
+                    let wn2 = p.chameleon ? " - kaméleon)" : ")";
+                    wn = wn + wn2;
+                    winners.push(wn);
+                }
+            }
+        }
+        //goodwin
+        if (levils.length < 1) {
+            end = true;
+            for (let i = 0; i < Common.playerNum; i++) {
+                let p = Players.players[i];
+                if (!p.evil && p.alive && !p.winalone) {
+                    let wn = p.name + " (" + p.role.nev;
+                    let wn2 = p.chameleon ? " - kaméleon)" : ")";
+                    wn = wn + wn2;
+                    winners.push(wn);
+                }
+            }
+        }
+        //Forecaster
+        for (let i = 0; i < Common.playerNum; i++) {
+            let p = Players.players[i];
+            if (p.alive && p.role == CityPlayers.FORECASTER && p.forecast == City.day) {
+                let wn = p.name + " (" + p.role.nev;
+                let wn2 = p.chameleon ? " - kaméleon)" : ")";
+                wn = wn + wn2;
+                winners.push(wn);
+                end = true;
+            }
+        }
+        
+        //Hoover
+        if (City.hoovergun > 1) {
+            let alives = [];
+            for (let i = 0; i < Common.playerNum; i++) {
+                if (Players.players[i].alive) alives.push(i);
+            }
+            for (let i = 0; i < Common.playerNum; i++) {
+                let p = Players.players[i];
+                if (p.alive && p.role == CityPlayers.HOOVER) {
+                    let hw = true;
+                    delItem(alives, i);
+                    for (let j = 0; j < alives.length; j++) {
+                        let val = alives[j];
+                        if (!checkItem(p.gaveHoover, val)) hw = false;
+                    }
+                    if (hw) {
+                        let wn = p.name + " (" + p.role.nev;
+                        let wn2 = p.chameleon ? " - kaméleon)" : ")";
+                        wn = wn + wn2;
+                        winners.push(wn);
+                        end = true;
+                    }
+                    console.log("HOOVERWIN: ", alives, p.gaveHoover, hw);
+                }
+            }
+        }
+        
+            
+        if (end) {
+            winMS += `<p id="winnersList">Győzött ${smartList(winners, winners.length > 2)}!</p>`;
+            City.displayImportantMessage(winMS);
+        }
+        return end;
     }
 };

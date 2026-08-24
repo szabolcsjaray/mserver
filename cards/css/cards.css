@@ -423,14 +423,22 @@ img.showPlayerImg {
 }
 
 .resurname {
-  color: lime;
+  color: darkblue;
+  background-color: lime;
 }
 
 .deadname {
-  color: darkslategray;
+  color: snow;
+  background-color: black;
 }
 
 .hoovername {
-  color: brown;
+  color: red;
+  background-color: blue;
 }
 
+#gameEnd {
+  display: none;
+  background-color: skyblue;
+  color: forestgreen;
+}

@@ -71,6 +71,8 @@ export const Html = {
     MORNING_OVERLAY : "morningOverlay",
     MORNING_MESSAGE : "morningMessage",
     MORNING_NEXT_BUTTON : "morningNextButton",
+    GAME_END_MORNING : "gameEndM",
+    GAME_END_DAY : "gameEndD",
     BOX : "box",
     NAME: "name",
     DUMMY : ""

@@ -24,11 +24,10 @@ Players.Player = class Player {
         this.lover = []; //id of lover(s) connected by cupid(s)
         this.preneigh = -1; //id of previous target of Neighbor
         this.getHoover = false; //gets hoover at night
-        this.gotHoover = false; //got hoover at night earlier
+        this.gaveHoover = []; //people given a hoover by the Hoover
         this.resurrected = false; //will become alive the next morning
         this.usedResurrect = false; //priest used resurrect
         this.forecast = -1; //forecasted end day
-        this.endGame = -1; //if Baker (chameleon) is killed, end day of game
         this.potions = 0; //witch's potions
     }
 };

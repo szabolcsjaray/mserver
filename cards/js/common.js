@@ -55,15 +55,16 @@ function nevelos(str, nagy = false) {
 
 let tized = (v) => Math.round(v * 10) / 10;
 
-export let checkItem = (arr, it) => arr.indexOf(it) > -1;
+export let checkItem = (arr, it) => arr.indexOf(it.toString()) > -1;
 
 export let checkItemDeep = (arr, prop, it) => arr.findIndex((a) => a[prop] == it) > -1;
 
-let delItem = (arr, it) => {
+export let delItem = (arr, it) => {
     for (let n = 0; n < arr.length; n++) {
         if (arr[n] == it) {
             arr.splice(n, 1);
             n--;
+            console.log("deleted: ", arr, it)
         }
     }
 }
@@ -86,16 +87,21 @@ export let getObj = (arr, prop, it) => {
     }
 };
 
-export let smartList = (arr) => {
+export let smartList = (arr, newline=false) => {
     let s = "";
+    if (newline) s+="<br>";
     for (let i = 0; i < arr.length; i++) {
         let li = arr[i];
         if (i == 0) {
             s += li;
         } else if (i == arr.length-1) {
-            s += " és " + li;
+            s += " és ";
+            if (newline) s += "<br>";
+            s += li;
         } else {
-            s += ", " + li;
+            s += ", ";
+            if (newline) s += "<br>";
+            s += li;
         }
     }
     return s;
