@@ -786,8 +786,8 @@ export const City = {
         console.log('deathList: ', deathList);
         let followMS = "";
         for (const dl of deathList) {
-            let p = Players.players[dl];
-            switch (p.role) {
+            let dp = Players.players[dl];
+            switch (dp.role) {
                 case CityPlayers.BAKER:
                     let otherBaker = false;
                     for (let i = 0; i < Common.playerNum; i++) {
@@ -813,7 +813,8 @@ export const City = {
                         for (let j = 0; j < Common.playerNum; j++) {
                             let p = Players.players[j];
                             if (p.alive && p.role == CityPlayers.WATERGUN) {
-                                followMS = "A Vízipisztolyos gyerek felnőtt."
+                                followMS = "A Vízipisztolyos gyerek felnőtt.";
+                                p.winalone = false;
                             };
                         }
                     }
@@ -830,7 +831,8 @@ export const City = {
                         for (let j = 0; j < Common.playerNum; j++) {
                             let p = Players.players[j];
                             if (p.alive && p.role == CityPlayers.HOOVER) {
-                                followMS = "A Porszívóügynök más hivatást választott."
+                                followMS = "A Porszívóügynök más hivatást választott.";
+                                p.winalone = false;
                             };
                         }
                     }
