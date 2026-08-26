@@ -9,6 +9,7 @@ export const City = {
     testMode : true, //TODO: false if game is ready
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
+    chamhooverXtra: [], //who previously 0: getHoover, 1: getWater, 2: double hoover
     day: 0,
     hungerEnd : -1, //when no more bakers
     nextPhase : function() {
@@ -415,6 +416,7 @@ export const City = {
         }
     },
     nightActions : function() {
+        City.chamhooverXtra = [];
         let naList0 = getObjsC(Players.players, "gmnight", ">0");
         let naList = [];
         if (City.hoovergun < 2) {
@@ -451,7 +453,6 @@ export const City = {
                 }
             }
         }
-        
         
         City.realAction(naList[nalCount]);
     },
@@ -681,6 +682,16 @@ export const City = {
                 let happyP = Players.players[htarget];
                 happyP.getHoover = true;
                 player.gaveHoover.push(htarget);
+                if (!player.chameleon) {
+                    City.chamhooverXtra[0] = htarget;
+                } else {
+                    if (htarget == City.chamhooverXtra[1]) {
+                        happyP.killed = true;
+                    }
+                    if (htarget == City.chamhooverXtra[0]) {
+                        City.chamhooverXtra[2] = htarget;
+                    }
+                }
                 console.log("Hoover action on " + htarget, player.gaveHoover);
                 break;
             
@@ -689,6 +700,13 @@ export const City = {
                 let watarget = el(Html.NE_SELECT).value;
                 let wetP = Players.players[watarget];
                 if (wetP.getHoover) wetP.killed = true;
+                if (!player.chameleon) {
+                    City.chamhooverXtra[1] = watarget;
+                } else {
+                    if (watarget == City.chamhooverXtra[0]) {
+                        wetP.killed = true;
+                    }
+                }
                 console.log("Watergun action on " + watarget);
                 break;
 
@@ -770,7 +788,15 @@ export const City = {
             let hoovers = ["hiper-szuper", "csillivilli", "hápogó", "falra is mászó", "népdalokat éneklő", "idegtépően berregő", "hőre lágyuló", "jóravaló, takaros", "kellemetlen szagot árasztó", "nyugtalanítóan villogó", "szemtelen, mihaszna", "pöpecen önjáró", "peckesen lépkedő", "gúnyosan röfögő", "újszerűen kinéző", "alig használt", "fiatal, ambíciózus", "kissé bohó, de szerethető", "káros szenvedélyektől mentes", "kicsit sárga és savanyú", "szomorkásan zúgó", "minden kanyarban harsányan hahotázó", "öt percenként baljósan leálló", "szívszaggatóan köhécselő", "fanyar humorral megáldott", "komor füstöt árasztó"];
             for (const h of hooverroll) {
                 let adj = rnd(hoovers);
-                morningMS += `<p><span class="hoovername">${Players.players[h].name}</span> kapott egy ${adj} porszívót.</p>`;
+                if (City.chamhooverXtra.length < 3) {
+                    morningMS += `<p><span class="hoovername">${Players.players[h].name}</span> kapott egy ${adj} porszívót.</p>`;
+                } else {
+                    let adj2 = adj;
+                    while (adj2 == adj) {
+                        adj2 = rnd(hoovers);
+                    }
+                    morningMS += `<p><span class="hoovername">${Players.players[h].name}</span> kapott egy ${adj} és egy ${adj2} porszívót.</p>`;
+                }
             }
         }
         el(Html.MORNING_MESSAGE).innerHTML = morningMS;
