@@ -6,7 +6,7 @@ import { Players } from '../player.js';
 import { States } from "../states.js";
 
 export const City = {
-    testMode : true, //TODO: false if game is ready
+    testMode : false, //TODO: false if game is ready
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
     chamhooverXtra: [], //who previously 0: getHoover, 1: getWater, 2: double hoover
@@ -410,7 +410,6 @@ export const City = {
             else {
                 let hulla = Players.players[sid];
                 hulla.killed = true;
-                console.log('hulla: ', hulla);
                 City.nightActions();
             }
         }
@@ -578,9 +577,7 @@ export const City = {
                 if (City.hoovergun < 2) return;
                 el(Html.NE_SELECT).style.display = "block";
                 el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>";
-                console.log(actP.gaveHoover);
                 for (let i = 0; i < Common.playerNum; i++) {
-                    console.log(i + ": " + checkItem(actP.gaveHoover, i));
                     let p = Players.players[i];
                     if (p.alive && !checkItem(actP.gaveHoover, i) && p != actP) {
                         el(Html.NE_SELECT).innerHTML += "<option value='" + i + "'>" + p.name + "</option>";
@@ -800,7 +797,6 @@ export const City = {
             }
         }
         el(Html.MORNING_MESSAGE).innerHTML = morningMS;
-        console.log('deathroll: ', deathroll);
         City.checkDeathFollowup(deathroll);
         let end = City.checkCityEnd();
         el(Html.MORNING_NEXT_BUTTON).onclick = () => {
@@ -809,7 +805,6 @@ export const City = {
             }
     },
     checkDeathFollowup : function(deathList) {
-        console.log('deathList: ', deathList);
         let followMS = "";
         for (const dl of deathList) {
             let dp = Players.players[dl];
@@ -885,7 +880,6 @@ export const City = {
         }
     },
     checkCityEnd : function (winners=[]) {
-        console.log('winners: ', winners);
         let end = winners.length > 0;
         let winMS = "<p>VÉGET ÉRT A JÁTÉK!</p>";
         //hungerend
