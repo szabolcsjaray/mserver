@@ -6,7 +6,7 @@ import { Players } from '../player.js';
 import { States } from "../states.js";
 
 export const City = {
-    testMode : false, //TODO: false if game is ready
+    testMode : true, //TODO: false if game is ready
     activeRoles : [],
     hoovergun: 0, //0: no Hoover and Watergun, 1: one of them is alive, 2: 2 of them are alive
     chamhooverXtra: [], //who previously 0: getHoover, 1: getWater, 2: double hoover
@@ -191,6 +191,7 @@ export const City = {
         let chameleon = Players.players.find(p => p.role == CityPlayers.CHAMELEON);
         if (chameleon) {
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "block";
+            el("fncN").innerHTML = chameleon.name;
             el(Html.FIRST_NIGHT_CHAMELEON_BUTTON).onclick = () => {
                 let crole = el(Html.CHAMELEON_SELECT).value;
                 City.showRole(crole);
@@ -221,8 +222,10 @@ export const City = {
         if (directors.length > 0) {
             let director = getObj(directors, "chameleon", cham);
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
-             el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
+            el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
+            el(Html.FIRST_NIGHT_HALFBRO).style.display = "none";
             el(Html.FIRST_NIGHT_DIRECTOR).style.display = "block";
+            el("fndN").innerHTML = director.name;
             if (cham) {
                 el('igQ').innerHTML = "a Kaméleon";
             } else {
@@ -261,7 +264,9 @@ export const City = {
             let fv = 0;
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
             el(Html.FIRST_NIGHT_DIRECTOR).style.display = "none";
+            el(Html.FIRST_NIGHT_HALFBRO).style.display = "none";
             el(Html.FIRST_NIGHT_FORECASTER).style.display = "block";
+            el("fnfN").innerHTML = forecaster.name;
             if (cham) {
                 el('fcQ').innerHTML = "a Kaméleon";
             } else {
@@ -293,6 +298,7 @@ export const City = {
             el(Html.FIRST_NIGHT_CHAMELEON).style.display = "none";
             el(Html.FIRST_NIGHT_FORECASTER).style.display = "none";
             el(Html.FIRST_NIGHT_HALFBRO).style.display = "block";
+            el("fnhN").innerHTML = halfbro.name;
             el(Html.FIRST_NIGHT_KILLIST).innerHTML = "";
             if (cham) {
                 hbQ.innerHTML = "Kaméleon ";
@@ -325,6 +331,16 @@ export const City = {
         el(Html.FIRST_NIGHT_KILLERS_MEETING_BUTTON).style.display = "none";
         el(Html.FIRST_NIGHT_NEXT_BUTTON).disabled = false;
         el(Html.NEXT_BUTTON).disabled = false;
+
+        let killers = [];
+        for (let i = 0; i < Common.playerNum; i++) {
+            let p = Players.players[i];
+            if (p.role == CityPlayers.KILLER || p.role == CityPlayers.MAFFIA) {
+                killers.push(p.name);
+            }
+        }
+        el("fnkN").innerHTML = smartList(killers);
+
         el(Html.FIRST_NIGHT_NEXT_BUTTON).onclick = () => {
             el(Html.FIRST_NIGHT_OVERLAY).style.display = "none";
             Games.stepPhase();
@@ -477,7 +493,8 @@ export const City = {
         },
     realAction : (actP) => {
         let cham = actP.chameleon;
-        let ms = cham ? "A kaméleon csendben tegye a dolgát!<br>" : "";
+        let ms = `<span class="curName" style="float:left;">[${actP.name}]</span><br>`;
+        if (cham) ms += "A kaméleon csendben tegye a dolgát!<br>";
         ms += actP.role.nightSpeech;
         if (cham) ms += " (kaméleon)";
         el(Html.NE_SELECT).innerHTML = "";
@@ -576,6 +593,7 @@ export const City = {
             case CityPlayers.HOOVER:
                 if (City.hoovergun < 2) return;
                 el(Html.NE_SELECT).style.display = "block";
+                el(Html.NE_SELECT).style.disabled = false;
                 el(Html.NE_SELECT).innerHTML += "<option value = '-1'>Senkit</option>";
                 for (let i = 0; i < Common.playerNum; i++) {
                     let p = Players.players[i];

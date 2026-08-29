@@ -175,7 +175,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.5);
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -183,7 +183,7 @@
 
     /* The actual popup box */
     .modal-content {
-      background-color: white;
+      background-color: rgba(255, 255, 255, .9);
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -192,6 +192,11 @@
       text-align: center;
       animation: fadeIn 0.3s ease-out;
       margin: auto;
+    }
+
+    .modal-content p {
+      padding: 2px;
+      margin: 6px auto;
     }
 
     /* Close button */
@@ -338,6 +343,10 @@
   font-size: max(1.75vw, 1.5em);
 }
 
+.curName {
+  color: mediumslateblue;
+}
+
 #showRoleRole {
   color: orange;
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
@@ -425,20 +434,23 @@ img.showPlayerImg {
 .resurname {
   color: darkblue;
   background-color: lime;
+  border: solid 4px yellow;
 }
 
 .deadname {
   color: snow;
   background-color: black;
+  padding: 4px;
 }
 
 .hoovername {
   color: red;
   background-color: blue;
+  padding: 4px;
+  border: dashed 1px whitesmoke;
 }
 
-#gameEnd {
-  display: none;
-  background-color: skyblue;
-  color: forestgreen;
+.gameEndTxt {
+  background-color: deepskyblue;
+  color: lightcyan;
 }
