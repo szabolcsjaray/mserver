@@ -27,7 +27,6 @@ function init() {
   Players.readLastPlayers();
 
   Games.changeTo(Games.CITY);
-  Games.setPhase(States.PLAY);
 }
 
 // New game -----------------------------------------------
@@ -68,6 +67,11 @@ export function doAddPlayer(newName) {
         alert("A név nem lehet üres!");
         return;
       }
+      if (Players.allPlayersEverPlayed.includes(newName)) {
+        alert("A játékos " + newName + " már rajta van a listán.<br>"
+          + "Ha másik hasonló nevűt is fel szeretél venni, változtass a néven!");
+          return;
+      }
     }
     if (playerOnBoard(newName)) {
       return;
@@ -89,6 +93,8 @@ function playerRemove(evt) {
   if (id >= Common.playerNum) return;
   if (confirm("A játékos " + el("name"+id).innerText + " biztosan kiszáll?")) {
     points.splice(id, 1);
+    Players.players.splice(id, 1);
+    Players.writeLastPlayersToStore();
     points.push(0);
     for(let i = id; i < Common.playerNum - 1; i++) {
       let nextI = i+1;
@@ -341,7 +347,7 @@ function newPlayerSelected() {
     el("addButton").onclick = closePlayerModalAnddoAddPlayer;
   } else {
     closeAddPlayerModal();
-    doAddPlayer(Players.players[select.value].name);
+    doAddPlayer(Players.allPlayersEverPlayed[select.value]);
   }
 }
 
@@ -359,8 +365,11 @@ function openAddPlayerModal() {
   el("selectNameP").style.display = "inline";
   select.onselect = newPlayerSelected;
   select.options.length = 0;
-  for(let i = 0; i < Players.players.length; i++) {
-      select.appendChild(makeOption(i, Players.players[i].name));
+  for(let i = 0; i < Players.allPlayersEverPlayed.length; i++) {
+      if (Players.players.map(p => p.name).includes(Players.allPlayersEverPlayed[i])) {
+        continue;
+      }
+      select.appendChild(makeOption(i, Players.allPlayersEverPlayed[i]));
   }
   select.appendChild(makeOption(-1, "- Új név hozzáadása -"));
   

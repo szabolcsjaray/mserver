@@ -157,7 +157,8 @@ Games.cgames = [
         [
             States.CHOOSE_PLAYERS,
             States.CHOOSE_ROLES, States.SHOW_PLAYERS, States.FIRST_NIGHT,
-            States.DAY, States.NIGHT, States.MORNING],
+            States.DAY, States.NIGHT, States.MORNING
+        ],
         [
             [States.INITIAL, RuleAction.HIDE, Html.BASKET],
             [States.INITIAL, RuleAction.HIDE, Html.PLAY_BUTTON],
