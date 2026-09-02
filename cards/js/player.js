@@ -5,6 +5,7 @@ import { doAddPlayer } from './cards.js';
 export const Players = {};
 
 Players.players = []; // Player objects
+Players.allPlayersEverPlayed = [];  // the players names, who have ever played
 const PLAYERS_STORAGE_KEY = "cards.players";
 const LAST_PLAYERS_STORAGE_KEY = "cards.lastPlayers";
 Players.lastPlayers = []; // stores the actual player list, stored as lastPlayers
@@ -61,13 +62,13 @@ Players.readStoredPlayers = function () {
         Players.players = [];
         return;
     }
-    if (typeof playerNamesArray != "array" || playerNamesArray.length == 0
-        || typeof playerNamesArray[0] != "string") {
+    if (!(typeof playerNamesArray == "object") || playerNamesArray.length == 0
+        || !(typeof playerNamesArray[0] == "string")) {
         playerNamesArray = [];
         Players.players = [];
     }
     playerNamesArray.forEach(name => {
-        Players.players.push(new Players.Player(name));
+        Players.allPlayersEverPlayed.push(name);
     });
 };
 
@@ -89,7 +90,7 @@ Players.saveStoredPlayers = function () {
 };
 
 Players.writeLastPlayersToStore = function () {
-    localStorage.setItem(LAST_PLAYERS_STORAGE_KEY, JSON.stringify(Players.lastPlayers));
+    localStorage.setItem(LAST_PLAYERS_STORAGE_KEY, JSON.stringify(Players.players.map(p => p.name)));
 };
 
 Players.addLastPlayer = function (name) {
